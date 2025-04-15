@@ -1,11 +1,11 @@
 package io.meli.melimaps.domain.vertex;
 
-import java.math.RoundingMode;
-import java.util.HashMap;
 import java.util.Map;
 
 import io.meli.melimaps.enums.EnumTransport;
+import lombok.Getter;
 
+@Getter
 public class VertexData {
     private long metersFromParentVertex = 0;
     private Map<EnumTransport, Integer> minutesToReach;
@@ -21,7 +21,12 @@ public class VertexData {
     
     private Map<EnumTransport, Integer> mapTimeToReachByTransport(Long distance) {
 
-        Map<EnumTransport, Integer> minutes = new HashMap<EnumTransport, Integer>();
+        Map<EnumTransport, Integer> minutes = Map.of(
+            EnumTransport.BUS, timeToTravelDistanceByTransport(distance, EnumTransport.BUS),
+            EnumTransport.BIKE, timeToTravelDistanceByTransport(distance, EnumTransport.BIKE),
+            EnumTransport.RAILWAY, timeToTravelDistanceByTransport(distance, EnumTransport.RAILWAY),
+            EnumTransport.FOOT, timeToTravelDistanceByTransport(distance, EnumTransport.FOOT)
+        );
 
         return minutes;
     }
