@@ -1,6 +1,6 @@
-package io.meli.melimaps.domain.user;
+package io.meli.melimaps.model;
 
-import io.meli.melimaps.domain.vertex.Vertex;
+import io.meli.melimaps.enums.EnumTransport;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,13 +12,16 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String name;
 
     @NonNull
-    private UserPreferences preferences;
+    private EnumTransport prefferedTransport;
 
     @NonNull
     private Vertex initialPosition;
+
+    private boolean considerAccessibility = false;
+    private boolean considerCO2Emissions = false;
 }
