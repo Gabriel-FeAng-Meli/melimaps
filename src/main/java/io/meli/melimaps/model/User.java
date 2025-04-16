@@ -1,13 +1,13 @@
 package io.meli.melimaps.model;
 
+import io.meli.melimaps.dto.UserDTO;
 import io.meli.melimaps.enums.EnumTransport;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Data;
-import lombok.NonNull;
 
-@Data
+@Entity
 public class User {
 
     @Id
@@ -16,12 +16,45 @@ public class User {
 
     private String name;
 
-    @NonNull
     private EnumTransport prefferedTransport;
+    
+    private Boolean considerAccessibility;
+    
+    private Boolean ecologic;
 
-    @NonNull
-    private Vertex initialPosition;
+    public Integer getId() {
+        return id;
+    }
 
-    private boolean considerAccessibility = false;
-    private boolean considerCO2Emissions = false;
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public EnumTransport getPrefferedTransport() {
+        return prefferedTransport;
+    }
+    public void setPrefferedTransport(EnumTransport prefferedTransport) {
+        this.prefferedTransport = prefferedTransport;
+    }
+    
+    public Boolean considerAccessibility() {
+        return considerAccessibility;
+    }
+    public void setConsiderAccessibility(Boolean considerAccessibility) {
+        this.considerAccessibility = considerAccessibility;
+    }
+    
+    public Boolean isEcologic() {
+        return ecologic;
+    }
+    public void setEcologic(Boolean considerCO2Emissions) {
+        this.ecologic = considerCO2Emissions;
+    }
+
+    public UserDTO toDTO() {
+        return new UserDTO(this);
+    }
 }

@@ -7,13 +7,33 @@ public enum EnumTransport {
     BIKE;
 
     public static Integer transportSpeedInKmPerHour(EnumTransport transport) {
-        switch (transport) {
-            case BUS: return 40;
-            case RAILWAY: return 120;
-            case FOOT: return 4;
-            case BIKE: return 18;
-            default: return 0;
-        }
+        return switch (transport) {
+            case BUS -> 40;
+            case RAILWAY -> 120;
+            case FOOT -> 4;
+            case BIKE -> 18;
+            default -> 0;
+        };
+    }
+
+    public static String toString(EnumTransport transport) {
+        return switch (transport) {
+            case BUS -> "bus";
+            case RAILWAY -> "railway";
+            case BIKE -> "bike";
+            case FOOT -> "foot";
+            default -> null;
+        };
+    }
+
+    public static EnumTransport toEnum(String type) {
+        return switch (type) {
+            case "bus" -> BUS;
+            case "railway" -> BUS;
+            case "bike" -> BUS;
+            case "foot" -> FOOT;
+            default -> null;
+        };
     }
 
 }

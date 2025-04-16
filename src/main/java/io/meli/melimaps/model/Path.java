@@ -1,31 +1,29 @@
 package io.meli.melimaps.model;
 
-import io.meli.melimaps.enums.EnumTransport;
-
 public class Path {
-    
-    private int weight;
-    private EnumTransport type = EnumTransport.FOOT;
-    private boolean ecologic = false;
-    private boolean accessible = false;
+
+    private String name;
+    private int distance;
+    private boolean ecologic;
+    private boolean accessible;
     private Vertex origin;
     private Vertex destination;
 
-    public Path(Vertex origin, Vertex destination, EnumTransport transport, boolean eco, boolean accessible) {
-        this.weight = 0;
-        this.type = transport;
-        this.ecologic = eco;
-        this.accessible = accessible;
+    public Path(String name, int distance, Vertex origin, Vertex destination, boolean isEcoFriendly, boolean isAccessible) {
+        this.name = name;
+        this.distance = distance;
+        this.ecologic = isEcoFriendly;
+        this.accessible = isAccessible;
         this.origin = origin;
         this.destination = destination;
     }
 
-    public int getWeight() {
-        return weight;
+    public int getDistance() {
+        return distance;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 
     public Vertex getOrigin() {
@@ -44,14 +42,6 @@ public class Path {
         this.destination = destination;
     }
 
-    public EnumTransport getType() {
-        return type;
-    }
-
-    public void setType(EnumTransport type) {
-        this.type = type;
-    }
-
     public boolean isEcologic() {
         return ecologic;
     }
@@ -66,6 +56,14 @@ public class Path {
 
     public void setAccessible(boolean accessible) {
         this.accessible = accessible;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
     
 }

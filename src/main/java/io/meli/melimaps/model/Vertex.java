@@ -10,8 +10,8 @@ public class Vertex{
     private boolean visited = false;
     private int weight = Integer.MAX_VALUE;
     private Vertex parent;
-    private List<Path> paths = new ArrayList<Path>();
-    private List<Vertex> children = new ArrayList<Vertex>();
+    private final List<Path> paths = new ArrayList<>();
+    private final List<Vertex> children = new ArrayList<>();
     
     public String getName() {
         return name;
@@ -61,15 +61,6 @@ public class Vertex{
     }
     public void addChildren(Vertex child) {
         this.children.add(child);
-    }
-
-    public int compareTo(Vertex otherVertex) {
-        if (this.getWeight() < otherVertex.getWeight()) {
-            return -1;
-        } else if (this.getWeight() == otherVertex.getWeight()) {
-            return 0;
-        }
-        return 1;
     }
 
 }

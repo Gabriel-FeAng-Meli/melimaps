@@ -5,7 +5,7 @@ import java.util.List;
 import io.meli.melimaps.model.User;
 import io.meli.melimaps.model.Vertex;
 
-public class BusTransportStrategy extends AbstractTransportStrategy {
+public class RailwayTransportStrategy extends AbstractTransportStrategy {
 
     
     @Override

@@ -5,7 +5,7 @@ import java.util.List;
 import io.meli.melimaps.model.User;
 import io.meli.melimaps.model.Vertex;
 
-public class BusTransportStrategy extends AbstractTransportStrategy {
+public class BikeTransportStrategy extends AbstractTransportStrategy {
 
     
     @Override
@@ -13,9 +13,9 @@ public class BusTransportStrategy extends AbstractTransportStrategy {
 
     }
 
+
     @Override
     public List<Vertex> calculateBestRoute() {
         return null;
     }
-
 }
