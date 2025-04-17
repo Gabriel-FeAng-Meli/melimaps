@@ -1,7 +1,5 @@
 package io.meli.melimaps.model;
 
-import io.meli.melimaps.dto.UserDTO;
-import io.meli.melimaps.enums.EnumTransport;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,45 +14,59 @@ public class User {
 
     private String name;
 
-    private EnumTransport prefferedTransport;
-    
-    private Boolean considerAccessibility;
-    
+    private String transport;
+
+    private Boolean accessibility;
+
     private Boolean ecologic;
+
+    public User(String name, String transport, Boolean accessibility, Boolean ecologic) {
+        this.name = name;
+        this.transport = transport;
+        this.accessibility = accessibility;
+        this.ecologic = ecologic;
+    }
+    
+    public User() {
+    }
 
     public Integer getId() {
         return id;
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public EnumTransport getPrefferedTransport() {
-        return prefferedTransport;
-    }
-    public void setPrefferedTransport(EnumTransport prefferedTransport) {
-        this.prefferedTransport = prefferedTransport;
-    }
-    
-    public Boolean considerAccessibility() {
-        return considerAccessibility;
-    }
-    public void setConsiderAccessibility(Boolean considerAccessibility) {
-        this.considerAccessibility = considerAccessibility;
-    }
-    
-    public Boolean isEcologic() {
-        return ecologic;
-    }
-    public void setEcologic(Boolean considerCO2Emissions) {
-        this.ecologic = considerCO2Emissions;
+    public String getTransport() {
+        return transport;
     }
 
-    public UserDTO toDTO() {
-        return new UserDTO(this);
+    public void setTransport(String transport) {
+        this.transport = transport;
+    }
+
+    public Boolean getAccessibility() {
+        return accessibility;
+    }
+
+    public void setAccessibility(Boolean accessibility) {
+        this.accessibility = accessibility;
+    }
+
+    public Boolean getEcologic() {
+        return ecologic;
+    }
+
+    public void setEcologic(Boolean ecologic) {
+        this.ecologic = ecologic;
     }
 }
