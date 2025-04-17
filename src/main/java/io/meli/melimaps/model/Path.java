@@ -1,21 +1,32 @@
 package io.meli.melimaps.model;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import io.meli.melimaps.enums.EnumTransport;
+
 public class Path {
 
     private String name;
-    private int distance;
-    private boolean ecologic;
-    private boolean accessible;
+    private Integer distance;
     private Vertex origin;
     private Vertex destination;
+    private Set<EnumTransport> availableTransportation;
 
-    public Path(String name, int distance, Vertex origin, Vertex destination, boolean isEcoFriendly, boolean isAccessible) {
-        this.name = name;
+    private Path(int distance, Vertex origin, Vertex destination, EnumTransport... availableTransportation) {
+        this.name = origin.getName() + " -> " + destination.getName();
         this.distance = distance;
-        this.ecologic = isEcoFriendly;
-        this.accessible = isAccessible;
         this.origin = origin;
         this.destination = destination;
+        Set<EnumTransport> transports = new HashSet<>();
+        transports.addAll(Set.of(availableTransportation));
+        this.availableTransportation = transports; 
+    }
+
+    public static Path buildRoadConnecting(Integer roadLengthInKm, Vertex origin, Vertex destination, EnumTransport... transport) {
+        Path road = new Path(roadLengthInKm, origin, destination, transport);
+        return road;
     }
 
     public int getDistance() {
@@ -42,28 +53,24 @@ public class Path {
         this.destination = destination;
     }
 
-    public boolean isEcologic() {
-        return ecologic;
-    }
-
-    public void setEcologic(boolean ecologic) {
-        this.ecologic = ecologic;
-    }
-
-    public boolean isAccessible() {
-        return accessible;
-    }
-
-    public void setAccessible(boolean accessible) {
-        this.accessible = accessible;
-    }
-
-
     public String getName() {
         return name;
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<EnumTransport> getAvailableTransportation() {
+        return availableTransportation;
+    }
+
+    public boolean acceptsTransport(EnumTransport transport) {
+        return this.availableTransportation.contains(transport);
+    }
+
+    public void setAvailableTransportation(EnumTransport... availableTransportation) {
+        Arrays.asList(availableTransportation);
+        this.availableTransportation = Set.of(availableTransportation);
     }
     
 }

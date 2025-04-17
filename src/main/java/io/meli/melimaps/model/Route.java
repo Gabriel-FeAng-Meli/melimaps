@@ -1,55 +1,54 @@
 package io.meli.melimaps.model;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Route {
 
-	static List<Vertex> optimalRoute = new ArrayList<>();
-	static Vertex vertex = new Vertex();
-	static Vertex current = new Vertex();
-	static Vertex child = new Vertex();
-	static List<Vertex> notVisited = new ArrayList<>();
-	public static List<Vertex> dijkstra(Graph graph, Vertex origin,
-			Vertex destination) {
+	List<Vertex> optimalRoute = new ArrayList<>();
+	Vertex previous = new Vertex();
+	Vertex current = new Vertex();
+	Vertex next = new Vertex();
+	List<Vertex> notVisited = new ArrayList<>();
 
-		optimalRoute.add(origin);
-        List<Vertex> allVerticesOnMap = graph.getVertices();
-        allVerticesOnMap.stream().map(v -> {
-            if (v.getName().equalsIgnoreCase(origin.getName())) {
-                v.setDistance(0);
-            } 
-            notVisited.add(v);
-            return v;
-        }).collect(Collectors.toList());
+	public List<String> possibleRoutes = new ArrayList<>();
 
-		while (!notVisited.isEmpty()) {
-			current = notVisited.get(0);
-			current.getPaths().forEach(path -> {
-				child = path.getDestination();
-				if (!child.alreadyVisited()) {
-					if (child.getWeight() > (current.getWeight() + path.getDistance())) {
-						child.setDistance(current.getWeight()
-								+ path.getDistance());
-						child.setParent(current);
-						if (child == destination) {
+	public List<Vertex> findBestPossibleRoute(Graph g, Vertex origin, Vertex destination) {
+		g.getVertices().forEach(vertex -> {
+			notVisited.add(vertex);
+		});
+
+		// origin will be the first to start counting distances, so the distance towards himself is 0 and there is no previous vertex;
+		previous = null;
+		current = origin;
+		current.setWeight(0);
+		current.setPrevious(previous);
+
+		while(!notVisited.isEmpty()) {
+			current.getPaths().forEach(road -> {
+				next = road.getDestination();
+				if (!next.alreadyVisited()) {
+					if (next.getWeight() > current.getWeight() + road.getDistance()) {
+						next.setWeight(current.getWeight() + road.getDistance());
+						next.setPrevious(current);
+						previous = current;
+						current = next;
+						next = null;
+
+						if (current.getName().equalsIgnoreCase(destination.getName())) {
+							// got to destination -> come back adding every previous vertex went through to reach the destination to the path, until we get back to origin
 							optimalRoute.clear();
-							vertex = child;
-							optimalRoute.add(child);
-							while (vertex.getParent() != null) {
-								optimalRoute.add(vertex.getParent());
-								vertex = vertex.getParent();
-							}
-						}
-					}
-				}  
-			});
+							while(!current.getName().equalsIgnoreCase(origin.getName())) {
+								optimalRoute.add(current);
+								current = current.getPrevious();
+							}// -> still did not reach destination, loop again infinetely until reaching
+						} 
+					}// -> next point weight is either infinity (Integer.max) or had a worse path than the current one
+				}// -> vertex already visited
+			});// still inside while loop but has already gone through all paths
 			current.visit();
 			notVisited.remove(current);
-            
-            optimalRoute = optimalRoute.stream().sorted(Comparator.comparingInt(v -> v.getWeight())).collect(Collectors.toList());
+
 		}
 
 		return optimalRoute;
