@@ -1,32 +1,28 @@
 package io.meli.melimaps.service;
 
-import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import io.meli.melimaps.model.Dijkstra;
 import io.meli.melimaps.model.Graph;
-import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
 @Service
 public class RouteService {
 
     @Autowired
-    Graph map;
+    Graph graph;
 
-    // @Autowired
-    // UserService userService;
-
-    public List<Vertex> generateOptimalRouteForUser(Integer userId, String originName, String destinationName) {
+    public Map<String, String> generateOptimalRouteForUser(Integer userId, String originName, String destinationName) {
         // User user = userService.getUserById(userId);
-        // transportStategyFactory picks preferences and instantiates the right one;
+        // transportStategyFactory picks preferences and instantiates the right one to modify the weight on each road;
 
-        Route r = new Route();
+        Vertex origin = graph.findPlaceByName(originName);
+        Vertex destination = graph.findPlaceByName(destinationName);
 
-        var optimalRoute = r.findBestPossibleRoute(map, map.findPlaceByName(originName), map.findPlaceByName(destinationName));
-
-        return optimalRoute;
+        return Map.of("Best path considering user prefferences: ",Dijkstra.getShortestPathBetween(origin, destination, graph.getVertices()));
     }
 
     

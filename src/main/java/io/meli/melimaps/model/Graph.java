@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class Graph {
 
-    private List<Vertex> vertices;
+    private final List<Vertex> vertices;
 
     public Graph() {
         this.vertices = new ArrayList<>();

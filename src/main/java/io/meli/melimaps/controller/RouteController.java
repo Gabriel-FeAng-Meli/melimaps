@@ -21,9 +21,9 @@ public class RouteController {
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody RequestOptimalRoute req) {
 
-        var response = routeService.generateOptimalRouteForUser(req.userId(), req.originName(), req.destinationName());
+        var result = routeService.generateOptimalRouteForUser(req.userId(), req.originName(), req.destinationName());
 
-        return new ResponseEntity<>(response.get(0).toString(),HttpStatus.CREATED);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
     
 }
