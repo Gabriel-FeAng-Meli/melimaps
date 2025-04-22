@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.meli.melimaps.factories.TransportStrategyFactory;
+import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Graph;
 import io.meli.melimaps.model.User;
 import io.meli.melimaps.model.UserPreferences;
@@ -27,14 +28,14 @@ public class RouteService {
         User user = userService.getUserById(userId);
         UserPreferences preferences = new UserPreferences(user.getTransport(), user.getEcologic(), user.getAccessibility(), false);
         // transportStategyFactory picks preferences and instantiates the right one to modify the weight on each road;
-        transportStrategyFactory.instantiateRightStrategy(preferences);
+        TransportStrategy strategy = transportStrategyFactory.instantiateRightStrategy(preferences);
 
 
 
         Vertex origin = graph.findPlaceByName(originName);
         Vertex destination = graph.findPlaceByName(destinationName);
 
-        return Map.of("Best path considering user prefferences: ",Dijkstra.getShortestPathBetween(origin, destination, graph.getVertices()));
+        return Map.of("Best path considering user prefferences: ", strategy.getShortestPathBetween(origin, destination, graph.getVertices()));
     }
 
     

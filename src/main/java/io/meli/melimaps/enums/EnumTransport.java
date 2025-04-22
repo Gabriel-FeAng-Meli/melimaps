@@ -1,5 +1,7 @@
 package io.meli.melimaps.enums;
 
+import io.meli.melimaps.model.UserPreferences;
+
 public enum EnumTransport {
     BUS,
     RAILWAY,
@@ -40,6 +42,10 @@ public enum EnumTransport {
             case FOOT -> 4;
             case BIKE -> 18;
         };
+    }
+
+    public static EnumTransport chooseBestTransport(UserPreferences pref) {
+        return FOOT;
     }
 
 }

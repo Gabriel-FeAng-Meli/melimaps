@@ -10,9 +10,15 @@ import io.meli.melimaps.strategy.RailwayTransportStrategy;
 
 public class TransportStrategyFactory {
 
-    public TransportStrategy instantiateRightStrategy(UserPreferences preferences) {
+    private EnumTransport type;
 
-        EnumTransport type = EnumTransport.valueOf(preferences.transport());
+    public TransportStrategy instantiateRightStrategy(UserPreferences preferences) {    
+        
+        if (!preferences.transport().isEmpty()) {
+            type = EnumTransport.valueOf(preferences.transport());
+        } else {
+            type = EnumTransport.chooseBestTransport(preferences);
+        }
 
         return switch (type) {
             case BUS -> new BusTransportStrategy();
