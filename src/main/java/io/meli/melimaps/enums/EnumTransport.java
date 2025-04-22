@@ -6,33 +6,39 @@ public enum EnumTransport {
     FOOT,
     BIKE;
 
-    public static Integer transportSpeedInKmPerHour(EnumTransport transport) {
-        return switch (transport) {
+    public boolean isEco() {
+        return switch (this) {
+            case BUS -> false;
+            case RAILWAY -> true;
+            case BIKE -> true;
+            case FOOT -> true;
+        };
+    }
+
+    public boolean isAccessible() {
+        return switch(this) {
+            case BUS -> true;
+            case RAILWAY -> true;
+            case BIKE -> false;
+            case FOOT -> false;
+        };
+    }
+
+    public Double costPerKm() {
+        return switch (this) {
+            case BUS -> 3.20;
+            case RAILWAY -> 0.8;
+            case FOOT -> 0.0;
+            case BIKE -> 0.0;
+        };
+    }
+
+    public Integer transportSpeedInKmPerHour() {
+        return switch (this) {
             case BUS -> 40;
             case RAILWAY -> 120;
             case FOOT -> 4;
             case BIKE -> 18;
-            default -> 0;
-        };
-    }
-
-    public static String toString(EnumTransport transport) {
-        return switch (transport) {
-            case BUS -> "bus";
-            case RAILWAY -> "railway";
-            case BIKE -> "bike";
-            case FOOT -> "foot";
-            default -> null;
-        };
-    }
-
-    public static EnumTransport toEnum(String type) {
-        return switch (type) {
-            case "bus" -> BUS;
-            case "railway" -> BUS;
-            case "bike" -> BUS;
-            case "foot" -> FOOT;
-            default -> null;
         };
     }
 

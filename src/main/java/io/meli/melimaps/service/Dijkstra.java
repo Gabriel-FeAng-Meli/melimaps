@@ -1,4 +1,4 @@
-package io.meli.melimaps.model;
+package io.meli.melimaps.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +9,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import io.meli.melimaps.model.Vertex;
 
 public abstract class Dijkstra {
 

@@ -8,11 +8,8 @@ import java.util.Map;
 public class Vertex implements Comparable<Vertex>{
     
     private final String name;
-    
     private Integer weight;
-
     private List<Vertex> shortestPathToEachVertex;
-
     private Map<Vertex, Integer> adjacentNodesAndDistance;
 
     public Vertex(String name) {
