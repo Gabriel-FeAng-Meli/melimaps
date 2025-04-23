@@ -23,15 +23,15 @@ public enum EnumTransport {
 
     public Double costPerStop() {
         return switch (this) {
-            case BUS -> 3.20;
-            case RAILWAY -> 0.8;
+            case BUS -> 5.80;
+            case RAILWAY -> 2.60;
             case FOOT, BIKE, CAR -> 0.0;
         };
     }
 
     public Double costPerKm() {
         return switch(this) {
-            case CAR -> 15.0;
+            case CAR -> 1.20;
             default -> 0.0;
         };
     }
@@ -39,8 +39,8 @@ public enum EnumTransport {
     public Integer minutesStoppedAtEachPoint() {
         return switch(this) {
             case CAR, FOOT, BIKE -> 0;
-            case BUS -> 2;
-            case RAILWAY -> 4;
+            case BUS -> 15;
+            case RAILWAY -> 5;
         };
     }
 

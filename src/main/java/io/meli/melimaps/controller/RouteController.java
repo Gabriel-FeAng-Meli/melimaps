@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.meli.melimaps.model.RequestOptimalRoute;
 import io.meli.melimaps.service.RouteService;
 
@@ -19,7 +21,7 @@ public class RouteController {
     private RouteService routeService;
 
     @PostMapping
-    public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req) {
+    public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req) throws JsonProcessingException {
 
         var result = routeService.generateOptimalRouteForUser(req.userId(), req.originName(), req.destinationName());
 

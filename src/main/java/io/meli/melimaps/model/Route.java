@@ -1,5 +1,7 @@
 package io.meli.melimaps.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.meli.melimaps.enums.EnumTransport;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,18 +13,18 @@ public class Route {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Integer id;
-
 
     private String transport;
     private String originName;
     private String destinationName;
-    private Integer distance;
+    private String distance;
     private String timeToReach;
     private String totalCost;
     private String path;
     
-    public Route(Integer id, String transport, String originName, String destinationName, Integer distance,
+    public Route(Integer id, String transport, String originName, String destinationName, String distance,
     String timeToReach, String totalCost, String path) {
         this.id = id;
         this.transport = transport;
@@ -34,7 +36,7 @@ public class Route {
         this.path = path;
     }
 
-    public Route(EnumTransport transport, String origin, String destination, Integer distance, String timeToReach, String cost, String path) {
+    public Route(EnumTransport transport, String origin, String destination, String distance, String timeToReach, String cost, String path) {
         this.transport = transport.name();
         this.originName = origin;
         this.destinationName = destination;
@@ -45,12 +47,11 @@ public class Route {
     }
 
     public Route() {
-        
     }
+    
     public Integer getId() {
         return id;
     }
-
 
     public void setId(Integer id) {
         this.id = id;
@@ -73,10 +74,10 @@ public class Route {
     public void setDestinationName(String destinationName) {
         this.destinationName = destinationName;
     }
-    public Integer getDistance() {
+    public String getDistance() {
         return distance;
     }
-    public void setDistance(Integer distance) {
+    public void setDistance(String distance) {
         this.distance = distance;
     }
     public String getTimeToReach() {
