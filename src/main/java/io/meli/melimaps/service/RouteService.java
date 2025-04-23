@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import io.meli.melimaps.factories.TransportStrategyFactory;
 import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Graph;
+import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.User;
 import io.meli.melimaps.model.UserPreferences;
 import io.meli.melimaps.model.Vertex;
@@ -27,15 +28,15 @@ public class RouteService {
     public Map<String, String> generateOptimalRouteForUser(Integer userId, String originName, String destinationName) {
         User user = userService.getUserById(userId);
         UserPreferences preferences = new UserPreferences(user.getTransport(), user.getEcologic(), user.getAccessibility(), false);
-        // transportStategyFactory picks preferences and instantiates the right one to modify the weight on each road;
+
         TransportStrategy strategy = transportStrategyFactory.instantiateRightStrategy(preferences);
-
-
 
         Vertex origin = graph.findPlaceByName(originName);
         Vertex destination = graph.findPlaceByName(destinationName);
 
-        return Map.of("Best path considering user prefferences: ", strategy.getShortestPathBetween(origin, destination, graph.getVertices()));
+        Route route = strategy.calculateBestRoute(origin, destination);
+
+        return Map.of("Best path considering user prefferences: ", route.getPath());
     }
 
     

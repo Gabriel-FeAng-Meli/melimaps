@@ -1,20 +1,21 @@
 package io.meli.melimaps.strategy;
 
-import java.util.List;
-
-import io.meli.melimaps.model.User;
+import io.meli.melimaps.enums.EnumTransport;
+import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
 public class FootTransportStrategy extends AbstractTransportStrategy {
 
+    public FootTransportStrategy() {
+        super.type = EnumTransport.FOOT;
+    }
+
+    @Override
+    public Route calculateBestRoute(Vertex origin, Vertex destination) {
+
+        var result = getShortestPathBetween(origin, destination, map.getVertices());
+
+        return result;
+    }
     
-    @Override
-    public void defineBestRouteConditionsForUserPreference(User user, List<Vertex> graph) {
-
-    }
-
-    @Override
-    public List<Vertex> calculateBestRoute() {
-        return null;
-    }
 }

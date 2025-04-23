@@ -4,10 +4,10 @@ import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
-public class BikeTransportStrategy extends AbstractTransportStrategy {
+public class CarTransportStrategy extends AbstractTransportStrategy {
 
-    public BikeTransportStrategy() {
-        super.type = EnumTransport.BIKE;
+    public CarTransportStrategy() {
+        super.type = EnumTransport.CAR;
     }
 
     @Override

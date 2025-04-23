@@ -9,23 +9,23 @@ public class Vertex implements Comparable<Vertex>{
     
     private final String name;
     private Integer weight;
-    private List<Vertex> shortestPathToEachVertex;
-    private Map<Vertex, Integer> adjacentNodesAndDistance;
+    private List<Vertex> weightedVerticesInReachOrder;
+    private Map<Vertex, Integer> childVerticesAndDistance;
 
     public Vertex(String name) {
         this.name = name;
         this.weight = Integer.MAX_VALUE;
-        this.shortestPathToEachVertex = new LinkedList<>();
-        this.adjacentNodesAndDistance = new HashMap<>();
+        this.weightedVerticesInReachOrder = new LinkedList<>();
+        this.childVerticesAndDistance = new HashMap<>();
     }
 
-    public void addAdjacentNode(Vertex node, int distance) {
-        adjacentNodesAndDistance.put(node, distance);
+    public void addAdjacentVertex(Vertex vertex, int distance) {
+        childVerticesAndDistance.put(vertex, distance);
     }
 
     @Override
-    public int compareTo(Vertex node) {
-        return Integer.compare(this.weight, node.getWeight());
+    public int compareTo(Vertex vertex) {
+        return Integer.compare(this.weight, vertex.getWeight());
     }
 
     public String getName() {
@@ -40,20 +40,20 @@ public class Vertex implements Comparable<Vertex>{
         this.weight = distance;
     }
 
-    public List<Vertex> getShortestPathToEachVertex() {
-        return shortestPathToEachVertex;
+    public List<Vertex> getWeightedVerticesInReachOrder() {
+        return weightedVerticesInReachOrder;
     }
 
-    public void setShortestPathToEachVertex(List<Vertex> shortestPath) {
-        this.shortestPathToEachVertex = shortestPath;
+    public void setWeightedVerticesInReachOrder(List<Vertex> shortestPath) {
+        this.weightedVerticesInReachOrder = shortestPath;
     }
 
-    public Map<Vertex, Integer> getAdjacentNodesAndDistance() {
-        return adjacentNodesAndDistance;
+    public Map<Vertex, Integer> getChildVerticesAndDistance() {
+        return childVerticesAndDistance;
     }
 
-    public void setAdjacentNodesAndDistance(Map<Vertex, Integer> adjacentNodes) {
-        this.adjacentNodesAndDistance = adjacentNodes;
+    public void setChildVerticesAndDistance(Map<Vertex, Integer> adjacentVertices) {
+        this.childVerticesAndDistance = adjacentVertices;
     }
 
 }

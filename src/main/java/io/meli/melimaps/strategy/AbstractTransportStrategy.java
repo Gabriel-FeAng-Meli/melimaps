@@ -10,51 +10,80 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.TransportStrategy;
-import io.meli.melimaps.model.User;
+import io.meli.melimaps.model.Graph;
+import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
 public abstract class AbstractTransportStrategy implements TransportStrategy {
 
-    public abstract void defineBestRouteConditionsForUserPreference(User user, List<Vertex> graph);
-    public abstract List<Vertex> calculateBestRoute();
+    @Autowired
+    protected Graph map;
 
-    public final void build() {
-        defineBestRouteConditionsForUserPreference(null, null);
-        calculateBestRoute();
+    protected EnumTransport type;
+
+    protected Route getShortestPathBetween(Vertex source, Vertex destination, List<Vertex> map) {
+        List<Route> allPaths = calculateShortestPathToEachVertex(source, map);
+        Route result = allPaths.stream()
+                .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName())).findFirst()
+                .orElseThrow();
+        return result;
     }
 
+    private String calculateTotalCost(Integer stop, Integer distance) {
 
-    public static List<String> writePaths(List<Vertex> nodes) {
+        Double totalCostForTransportation = stop * type.costPerStop() + distance * type.costPerKm();
 
-        List<String> paths = new ArrayList<>();
-        nodes.forEach(node -> {
-            String path = node.getShortestPathToEachVertex().stream().map(Vertex::getName).collect(Collectors.joining(" -> "));
-            if (!path.isBlank()) {
-                paths.add("%s -> %s : %s kilometers".formatted(path, node.getName(), node.getWeight()));
-            }
+        String cost = String.format("R$%s", totalCostForTransportation);
+
+        return cost;
+    }
+
+    private String calculateTimeToTravel(Integer distanceInKilometers) {
+        if (distanceInKilometers == 0) {
+            return "0 minutes";
+        }
+        Double timeInMinutes = 60 * type.transportSpeedInKmPerHour().doubleValue() / distanceInKilometers;
+        String result = String.format("%s minutes", Math.round(timeInMinutes));
+        return result;
+    }
+
+    private List<Route> returnAllPossibleRoutesFromSource(Vertex source, List<Vertex> weightedMap) {
+
+        List<Route> paths = new ArrayList<>();
+        weightedMap.forEach(node -> {
+
+            Integer stopCount = node.getWeightedVerticesInReachOrder().size() - 1;
+
+            String path = node.getWeightedVerticesInReachOrder().stream().map((vertex) -> {
+                return vertex.getName();
+            }).collect(Collectors.joining(" -> "));
+
+            String routePath = "%s -> %s".formatted(path, node.getName());
+            String estimatedTime = calculateTimeToTravel(node.getWeight());
+            String estimatedCost = calculateTotalCost(stopCount, node.getWeight());
+
+            Route routeToNode = new Route(type, source.getName(), node.getName(), node.getWeight(), estimatedTime,
+                    estimatedCost, routePath);
+
+            paths.add(routeToNode);
         });
         return paths;
     }
 
-    public static String getShortestPathBetween(Vertex source, Vertex destination, List<Vertex> map) {
-        List<String> allPaths = calculateShortestPathToEachNode(source, map);
-
-        String result = allPaths.stream().filter(s -> s.startsWith(source.getName()) && s.contains("-> %s :".formatted(destination.getName()))).findFirst().orElseThrow(() -> new RuntimeException("No path available to reach desired destination starting from inputed origin"));
-
-        return result;
-
-    }
-
-    private static void evaluateDistanceAndPath(Vertex adjacentNode, Integer edgeWeight, Vertex sourceNode) {
+    private void evaluateDistanceAndPath(Vertex adjacentNode, Integer edgeWeight, Vertex sourceNode) {
         Integer newDistance = sourceNode.getWeight() + edgeWeight;
         if (newDistance < adjacentNode.getWeight()) {
             adjacentNode.setWeight(newDistance);
-            adjacentNode.setShortestPathToEachVertex(Stream.concat(sourceNode.getShortestPathToEachVertex().stream(), Stream.of(sourceNode)).toList());
+            adjacentNode.setWeightedVerticesInReachOrder(Stream
+                    .concat(sourceNode.getWeightedVerticesInReachOrder().stream(), Stream.of(sourceNode)).toList());
         }
     }
 
-    public static List<String> calculateShortestPathToEachNode(Vertex source, List<Vertex> map) {
+    private List<Route> calculateShortestPathToEachVertex(Vertex source, List<Vertex> map) {
         source.setWeight(0);
 
         Set<Vertex> settledNodes = new HashSet<>();
@@ -62,15 +91,16 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
 
         while (!unsettledNodes.isEmpty()) {
             Vertex current = unsettledNodes.poll();
-            current.getAdjacentNodesAndDistance().entrySet().stream().filter(
-                entry -> !settledNodes.contains(entry.getKey())).forEach(entry -> {
-                    evaluateDistanceAndPath(entry.getKey(), entry.getValue(), current);
-                    unsettledNodes.add(entry.getKey());
-                });
+            current.getChildVerticesAndDistance().entrySet().stream().filter(
+                    entry -> !settledNodes.contains(entry.getKey())).forEach(entry -> {
+                        evaluateDistanceAndPath(entry.getKey(), entry.getValue(), current);
+                        unsettledNodes.add(entry.getKey());
+                    });
 
             settledNodes.add(current);
         }
 
-        return writePaths(map);
+        return returnAllPossibleRoutesFromSource(source, map);
     }
+
 }

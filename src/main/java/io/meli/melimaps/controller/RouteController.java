@@ -19,7 +19,7 @@ public class RouteController {
     private RouteService routeService;
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody RequestOptimalRoute req) {
+    public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req) {
 
         var result = routeService.generateOptimalRouteForUser(req.userId(), req.originName(), req.destinationName());
 

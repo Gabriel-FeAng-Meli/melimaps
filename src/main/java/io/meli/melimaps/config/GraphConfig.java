@@ -21,19 +21,15 @@ public class GraphConfig {
         Vertex e = new Vertex("E");
         Vertex f = new Vertex("F");
 
-        a.addAdjacentNode(b, 4);
-        a.addAdjacentNode(c, 9);
-
-        b.addAdjacentNode(c, 5);
-        b.addAdjacentNode(d, 3);
-        b.addAdjacentNode(e, 2);
-
-        c.addAdjacentNode(d, 12);
-
-        d.addAdjacentNode(e, 4);
-        d.addAdjacentNode(f, 22);
-
-        e.addAdjacentNode(f, 5);
+        a.addAdjacentVertex(b, 4);
+        a.addAdjacentVertex(c, 9);
+        b.addAdjacentVertex(c, 5);
+        b.addAdjacentVertex(d, 3);
+        b.addAdjacentVertex(e, 2);
+        c.addAdjacentVertex(d, 12);
+        d.addAdjacentVertex(e, 4);
+        d.addAdjacentVertex(f, 22);
+        e.addAdjacentVertex(f, 5);
 
 
         map.addVertices(a, b, c, d, e, f);
