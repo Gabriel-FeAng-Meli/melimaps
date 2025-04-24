@@ -29,12 +29,11 @@ public class RouteService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private Graph graph;
 
     public String generateOptimalRouteForUser(Integer userId, String originName, String destinationName) throws JsonProcessingException {
 
-        
+        Graph graph = Graph.build();
+
         User user = userService.getUserById(userId);
         UserPreferences preferences = new UserPreferences(user.getTransport(), user.getEcologic(), user.getAccessibility(), false);
         
@@ -45,7 +44,7 @@ public class RouteService {
         Route route;
 
         if (routeRepository.existsByTransportAndOriginNameAndDestinationName(strategy.getStrategyType().name(), originName, destinationName)) {
-            route = routeRepository.findByTransportAndOriginNameAndDestinationNameIgnoringCase(strategy.getStrategyType().name(), originName, destinationName).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+            route = routeRepository.findByTransportIgnoreCaseAndOriginNameIgnoreCaseAndDestinationNameIgnoreCase(strategy.getStrategyType().name(), originName, destinationName).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         } else {
             route = strategy.calculateBestRoute(origin, destination, graph.getVertices());
             routeRepository.save(route);

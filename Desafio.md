@@ -46,3 +46,6 @@ Criar um sistema em Spring Boot que recomenda as melhores rotas de transporte ur
 * Spring Profiles como **feature toggles** para ativar/desativar tipos de transporte ou estratégias de rota.  
 * Testes com `@WebMvcTest`, `@MockBean` e testes unitários para os algoritmos.
 
+
+Possivel mandar na url parametros de prioridade (eco, accessibility, time, budget)
+Response trás uma lista com as melhores opções para cada prioridade

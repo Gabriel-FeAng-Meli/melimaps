@@ -10,6 +10,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Route;
@@ -27,26 +30,21 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
     protected Route getShortestPathBetween(Vertex source, Vertex destination, List<Vertex> map) {
         List<Route> allPaths = calculateShortestPathToEachVertex(source, map);
         Route result = allPaths.stream()
-                .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName())).findFirst()
-                .orElseThrow();
+                .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName()) && route.getOriginName().equalsIgnoreCase(source.getName())).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return result;
     }
 
-    private String calculateTotalCost(Integer stops, Integer distance) {
+    private String calculateTotalCost(Long costForTransportation) {
 
-        Double totalCostForTransportation = stops * type.costPerStop() + distance * type.costPerKm();
+        Double totalCostForTransportation = costForTransportation.doubleValue()/100;
 
         String cost = String.format("R$%.02f", totalCostForTransportation);
 
         return cost;
     }
 
-    private String calculateTimeToTravel(Integer stops, Integer distanceInKilometers) {
-        if (distanceInKilometers == 0) {
-            return "0 minutes";
-        }
-        Long timeInMinutes = Math.round(60 * distanceInKilometers / type.transportSpeedInKmPerHour().doubleValue());
-        timeInMinutes += type.minutesStoppedAtEachPoint() * stops;
+    private String calculateTimeToTravel(Long timeInMinutes) {
 
         Long minutes = timeInMinutes % 60;
         Long hours = (timeInMinutes - minutes) / 60;
@@ -62,16 +60,14 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
         List<Route> paths = new ArrayList<>();
         weightedMap.forEach(node -> {
 
-            Integer stopCount = node.getWeightedVerticesInReachOrder().size();
-
             String path = node.getWeightedVerticesInReachOrder().stream().map((vertex) -> {
                 return vertex.getName();
             }).collect(Collectors.joining(" -> "));
 
             String routePath = "%s -> %s".formatted(path, node.getName());
             String distance = "%s kilometers".formatted(node.getWeight());
-            String estimatedTime = calculateTimeToTravel(stopCount, node.getWeight());
-            String estimatedCost = calculateTotalCost(stopCount, node.getWeight());
+            String estimatedTime = calculateTimeToTravel(node.getWeight().longValue());
+            String estimatedCost = calculateTotalCost(node.getWeight().longValue());
 
             Route routeToNode = new Route(type, source.getName(), node.getName(), distance, estimatedTime,
                     estimatedCost, routePath);

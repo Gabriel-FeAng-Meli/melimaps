@@ -18,6 +18,6 @@ public interface RouteRepository extends JpaRepository<Route, Integer>{
 
     Boolean existsByTransportAndOriginNameAndDestinationName(String transport, String originName, String destinationName);
 
-    Optional<Route> findByTransportAndOriginNameAndDestinationNameIgnoringCase(String transport, String originName, String destinationName);
+    Optional<Route> findByTransportIgnoreCaseAndOriginNameIgnoreCaseAndDestinationNameIgnoreCase(String transport, String originName, String destinationName);
     
 }

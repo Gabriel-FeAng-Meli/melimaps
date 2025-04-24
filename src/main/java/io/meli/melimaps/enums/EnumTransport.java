@@ -54,5 +54,15 @@ public enum EnumTransport {
         };
     }
 
+    public Integer polutionScore() {
+        return switch (this) {
+            case CAR -> 100;
+            case BUS -> 2;
+            case RAILWAY -> 2;
+            case FOOT -> 1;
+            case BIKE -> 1;
+        };
+    }
+
 
 }
