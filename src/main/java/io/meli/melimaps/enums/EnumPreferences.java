@@ -1,6 +1,7 @@
 package io.meli.melimaps.enums;
 
 public enum EnumPreferences {
+    DISTANCE,
     ECO,
     BUDGET,
     TIME,
@@ -11,10 +12,11 @@ public enum EnumPreferences {
         Double distance = distanceInKilometers.doubleValue();
 
         return switch (this) {
+            case DISTANCE -> distance;
             case ECO -> distance * t.polutionScore();
-            case ACCESSIBILITY -> distance * t.accessibilityScore();
+            case ACCESSIBILITY -> distance * t.badAccessibilityScore();
             case BUDGET -> (distance * t.costPerKm()) + t.costPerStop();
-            case TIME -> distance / t.transportSpeedInKmPerHour();
+            case TIME -> distance / t.transportSpeedInKmPerHour() + t.minutesStoppedAtEachPoint();
         };
     }
 }

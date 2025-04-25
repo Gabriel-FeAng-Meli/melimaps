@@ -26,8 +26,9 @@ public class RouteController {
     private RouteService routeService;
 
     @PostMapping
-    public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req, @RequestParam EnumPreferences[] preferences) throws JsonProcessingException {
+    public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req, @RequestParam(required=false, defaultValue="TIME") EnumPreferences... preferences) throws JsonProcessingException {
         
+
         List<EnumPreferences> preferenceList = Arrays.asList(preferences);
         var result = routeService.generateOptimalRouteForUser(req.userId(), req.originName(), req.destinationName(), preferenceList);
 

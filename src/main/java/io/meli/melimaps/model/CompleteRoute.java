@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Route {
+public class CompleteRoute {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class Route {
     private String totalCost;
     private String path;
     
-    public Route(Integer id, String transport, String originName, String destinationName, String distance,
+    public CompleteRoute(Integer id, String transport, String originName, String destinationName, String distance,
     String timeToReach, String totalCost, String path, String prioritize) {
         this.id = id;
         this.transport = transport;
@@ -38,7 +38,7 @@ public class Route {
         this.prioritize = prioritize;
     }
 
-    public Route(EnumTransport transport, String origin, String destination, String distance, String timeToReach, String cost, String path) {
+    public CompleteRoute(EnumTransport transport, String origin, String destination, String distance, String timeToReach, String cost, String path) {
         this.transport = transport.name();
         this.originName = origin;
         this.destinationName = destination;
@@ -48,7 +48,7 @@ public class Route {
         this.path = path;
     }
 
-    public Route() {
+    public CompleteRoute() {
     }
     
     public Integer getId() {

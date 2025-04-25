@@ -40,7 +40,7 @@ public enum EnumTransport {
         return switch(this) {
             case CAR, FOOT, BIKE -> 0;
             case BUS -> 15;
-            case RAILWAY -> 5;
+            case RAILWAY -> 50;
         };
     }
 
@@ -54,7 +54,7 @@ public enum EnumTransport {
         };
     }
 
-    public Integer accessibilityScore() {
+    public Integer badAccessibilityScore() {
         return switch (this) {
             case CAR -> 1;
             case BIKE -> 100;

@@ -37,9 +37,9 @@ public class Graph implements GraphStructure {
     public GraphStructure getWeightedGraphByPreference(EnumPreferences preferences, EnumTransport transport) {
 
         List<Vertex> weightedMap = vertices.stream().map((v) -> {
-            v.getChildVerticesAndDistance().entrySet().stream().map((entry) -> {
-                Double weight = preferences.factorDistanceIntoWeight(transport, entry.getValue());
-                entry.setValue(Math.round(weight.floatValue()));
+            v.getPathToChildren().entrySet().stream().map((entry) -> {
+                Double weight = preferences.factorDistanceIntoWeight(transport, entry.getValue().getDistance());
+                entry.getValue().setWeight(weight.intValue());
                 return entry;
             }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -56,8 +56,7 @@ public class Graph implements GraphStructure {
     public GraphStructure getGraphWithVerticesAvailableForTransport(EnumTransport transport) {
 
         List<Vertex> weightedMap = vertices.stream().map((v) -> {
-            v.getChildVerticesAndDistance().entrySet().stream().filter(entry -> v.getPathToChild(entry.getKey()).getTransport() == transport);
-
+            v.getPathToChildren().entrySet().stream().filter(entry -> entry.getValue().getTransport().equals(transport));
             return v;
         }).collect(Collectors.toList());
 
@@ -77,7 +76,7 @@ public class Graph implements GraphStructure {
         return vertex;
     }
 
-    public static Graph build() {
+    public Graph build() {
 
         Graph map = new Graph();
 
@@ -89,18 +88,18 @@ public class Graph implements GraphStructure {
         Vertex f = new Vertex("F");
         Vertex g = new Vertex("G");
 
-        a.addChildVertex(b, 4, EnumTransport.FOOT);
-        a.addChildVertex(c, 9, EnumTransport.FOOT);
-        b.addChildVertex(c, 5, EnumTransport.FOOT);
-        b.addChildVertex(d, 3, EnumTransport.FOOT);
-        b.addChildVertex(e, 2, EnumTransport.FOOT);
-        c.addChildVertex(d, 12, EnumTransport.FOOT);
-        d.addChildVertex(e, 4, EnumTransport.FOOT);
-        d.addChildVertex(f, 22, EnumTransport.FOOT);
-        e.addChildVertex(f, 5, EnumTransport.FOOT);
+        a.addChildVertex(b, 4, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        a.addChildVertex(c, 9, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        b.addChildVertex(c, 5, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        b.addChildVertex(d, 3, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        b.addChildVertex(e, 2, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        c.addChildVertex(d, 12, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        d.addChildVertex(e, 4, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        d.addChildVertex(f, 22, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        e.addChildVertex(f, 5, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         
-        a.addChildVertex(g, 50, EnumTransport.RAILWAY);
-        g.addChildVertex(f, 30, EnumTransport.RAILWAY);
+        a.addChildVertex(g, 10, EnumTransport.RAILWAY);
+        g.addChildVertex(f, 5, EnumTransport.RAILWAY);
 
 
         map.addVertices(a, b, c, d, e, f, g);

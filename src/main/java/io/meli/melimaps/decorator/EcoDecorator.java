@@ -1,21 +1,22 @@
 package io.meli.melimaps.decorator;
 
 import io.meli.melimaps.enums.EnumPreferences;
+import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.factories.TransportStrategyFactory;
 import io.meli.melimaps.interfaces.GraphStructure;
 import io.meli.melimaps.interfaces.TransportStrategy;
-import io.meli.melimaps.model.Route;
+import io.meli.melimaps.model.CompleteRoute;
 import io.meli.melimaps.model.UserPreferences;
 import io.meli.melimaps.model.Vertex;
 
 public class EcoDecorator extends BaseDecorator {
 
-        public EcoDecorator(TransportStrategy decoratedStrategy) {
-            super(decoratedStrategy);
+        public EcoDecorator(TransportStrategy decoratedStrategy, EnumTransport transport) {
+            super(decoratedStrategy, transport);
         }
 
         @Override
-        public Route calculateBestRoute(Vertex origin, Vertex destination, GraphStructure map) {
+        public CompleteRoute calculateBestRoute(Vertex origin, Vertex destination, GraphStructure map) {
             TransportStrategyFactory factory = new TransportStrategyFactory();
             UserPreferences p = new UserPreferences(transport.name(), false, false, false);
             TransportStrategy strategy = factory.instantiateRightStrategy(p);

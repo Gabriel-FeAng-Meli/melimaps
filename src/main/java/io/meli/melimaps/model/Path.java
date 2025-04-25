@@ -8,16 +8,18 @@ public class Path {
     private final Integer distance;
     private final Long timeToReachInMinutes;
     private final Long totalCostInCents;
-    private final Boolean ecologic;
-    private final Boolean accessible;
+    private final Integer ecologicScore;
+    private final Integer badAccessibilityScore;
+    private Integer weight;
 
     public Path(EnumTransport transport, Integer distance) {
         this.transport = transport;
         this.distance = distance;
         this.timeToReachInMinutes = calculateMinutes(distance);
         this.totalCostInCents = calculateCost(distance);
-        this.ecologic = transport.isEco();
-        this.accessible = transport.isAccessible();
+        this.ecologicScore = transport.polutionScore();
+        this.badAccessibilityScore = transport.badAccessibilityScore();
+        this.weight = distance;
     }
 
     private Long calculateMinutes(Integer distanceInKilometers) {
@@ -52,12 +54,21 @@ public class Path {
         return totalCostInCents;
     }
 
-    public Boolean getEcologic() {
-        return ecologic;
+
+    public Integer getWeight() {
+        return weight;
     }
 
-    public Boolean getAccessible() {
-        return accessible;
+    public void setWeight(Integer weight) {
+        this.weight = weight;
+    }
+
+    public Integer getEcologicScore() {
+        return ecologicScore;
+    }
+
+    public Integer getBadAccessibilityScore() {
+        return badAccessibilityScore;
     }
 
 }
