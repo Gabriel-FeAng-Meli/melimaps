@@ -12,6 +12,7 @@ public class RailwayTransportStrategy extends AbstractTransportStrategy {
         super.type = EnumTransport.RAILWAY;
     }
 
+    
     @Override
     public Route calculateBestRoute(Vertex origin, Vertex destination, List<Vertex> map) {
 

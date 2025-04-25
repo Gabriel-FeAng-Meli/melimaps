@@ -12,21 +12,21 @@ public class Vertex implements Comparable<Vertex>{
     private final String name;
     private Integer weight;
     private List<Vertex> weightedVerticesInReachOrder;
-    private List<Path> paths;
+    private final Map<Vertex, Path> pathToChildren;
     private final Map<Vertex, Integer> childVerticesAndDistance;
 
     public Vertex(String name) {
         this.name = name;
         this.weight = Integer.MAX_VALUE;
         this.weightedVerticesInReachOrder = new LinkedList<>();
-        this.paths = new LinkedList<>();
+        this.pathToChildren = new HashMap<>();
         this.childVerticesAndDistance = new HashMap<>();
     }
 
     public void addChildVertex(Vertex vertex, int distance, EnumTransport transport) {
         childVerticesAndDistance.put(vertex, distance);
-        Path path = new Path(transport, vertex, distance);
-        paths.add(path);
+        Path path = new Path(transport, distance);
+        pathToChildren.put(vertex, path);
     }
 
     @Override
@@ -54,16 +54,12 @@ public class Vertex implements Comparable<Vertex>{
         return childVerticesAndDistance;
     }
 
-    public List<Path> getPaths() {
-        return paths;
+    public Map<Vertex, Path> getPathToChildren() {
+        return pathToChildren;
     }
 
     public void setWeightedVerticesInReachOrder(List<Vertex> list) {
         this.weightedVerticesInReachOrder = list;
-    }
-
-    public void setPaths(List<Path> paths) {
-        this.paths = paths;
     }
 
 }

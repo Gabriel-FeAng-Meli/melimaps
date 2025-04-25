@@ -12,6 +12,7 @@ public class FootTransportStrategy extends AbstractTransportStrategy {
         super.type = EnumTransport.FOOT;
     }
 
+    
     @Override
     public Route calculateBestRoute(Vertex origin, Vertex destination, List<Vertex> map) {
 
@@ -19,5 +20,4 @@ public class FootTransportStrategy extends AbstractTransportStrategy {
 
         return result;
     }
-    
 }

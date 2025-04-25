@@ -18,6 +18,5 @@ public class CarTransportStrategy extends AbstractTransportStrategy {
         var result = getShortestPathBetween(origin, destination, map);
 
         return result;
-    }
-    
+    }    
 }

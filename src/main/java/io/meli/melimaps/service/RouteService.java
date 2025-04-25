@@ -1,12 +1,14 @@
 package io.meli.melimaps.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.meli.melimaps.enums.EnumPreferences;
+import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.factories.TransportStrategyFactory;
 import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Graph;
@@ -29,28 +31,34 @@ public class RouteService {
     @Autowired
     private UserService userService;
 
+    private EnumTransport transport;
+    private Vertex origin;
+    private Vertex destination;
 
-    public String generateOptimalRouteForUser(Integer userId, String originName, String destinationName) throws JsonProcessingException {
+
+    public String generateOptimalRouteForUser(Integer userId, String originName, String destinationName, List<EnumPreferences> preferenceList) throws JsonProcessingException {
 
         Graph graph = Graph.build();
 
         User user = userService.getUserById(userId);
         UserPreferences preferences = new UserPreferences(user.getTransport(), user.getEcologic(), user.getAccessibility(), false);
-        
-        TransportStrategy strategy = transportStrategyFactory.instantiateRightStrategy(preferences);
-        Vertex origin = graph.findPlaceByName(originName);
-        Vertex destination = graph.findPlaceByName(destinationName);
-        
-        Route route;
 
-        if (routeRepository.existsByTransportAndOriginNameAndDestinationName(strategy.getStrategyType().name(), originName, destinationName)) {
-            route = routeRepository.findByTransportIgnoreCaseAndOriginNameIgnoreCaseAndDestinationNameIgnoreCase(strategy.getStrategyType().name(), originName, destinationName).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+        TransportStrategy strategy = transportStrategyFactory.instantiateRightStrategy(preferences);
+
+        transport = strategy.getStrategyType();
+        origin = graph.findPlaceByName(originName);
+        destination = graph.findPlaceByName(destinationName);
+
+        Route bestRoute;
+
+        if (routeRepository.existsByTransportAndOriginNameAndDestinationNameAndPathAllIgnoreCase(transport.name(), originName, destinationName)) {
+            bestRoute = routeRepository.findByTransportAndOriginNameAndDestinationNameAndPathAllIgnoreCase(transport.name(), originName, destinationName);
         } else {
-            route = strategy.calculateBestRoute(origin, destination, graph.getVertices());
-            routeRepository.save(route);
+            bestRoute = strategy.calculateBestRoute(origin, destination, graph.getVertices());
+            routeRepository.save(bestRoute);
         }
 
-        String result = Json.mapper().writeValueAsString(route);
+        String result = Json.mapper().writeValueAsString(bestRoute);
 
         return result;
     }

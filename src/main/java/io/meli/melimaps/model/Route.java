@@ -20,12 +20,13 @@ public class Route {
     private String originName;
     private String destinationName;
     private String distance;
+    private String prioritize = "DISTANCE";
     private String timeToReach;
     private String totalCost;
     private String path;
     
     public Route(Integer id, String transport, String originName, String destinationName, String distance,
-    String timeToReach, String totalCost, String path) {
+    String timeToReach, String totalCost, String path, String prioritize) {
         this.id = id;
         this.transport = transport;
         this.originName = originName;
@@ -34,6 +35,7 @@ public class Route {
         this.timeToReach = timeToReach;
         this.totalCost = totalCost;
         this.path = path;
+        this.prioritize = prioritize;
     }
 
     public Route(EnumTransport transport, String origin, String destination, String distance, String timeToReach, String cost, String path) {
@@ -97,5 +99,13 @@ public class Route {
     }
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getPrioritize() {
+        return prioritize;
+    }
+
+    public void setPrioritize(String prioritize) {
+        this.prioritize = prioritize;
     }
 }

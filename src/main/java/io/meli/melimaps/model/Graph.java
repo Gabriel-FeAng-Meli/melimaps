@@ -3,11 +3,14 @@ package io.meli.melimaps.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.meli.melimaps.enums.EnumPreferences;
 import io.meli.melimaps.enums.EnumTransport;
+import io.meli.melimaps.interfaces.GraphStructure;
 
-public class Graph {
+public class Graph implements GraphStructure {
 
     private final List<Vertex> vertices;
 
@@ -15,14 +18,41 @@ public class Graph {
         this.vertices = new ArrayList<>();
     }
 
+    @Override
     public List<Vertex> getVertices() {
         return this.vertices;
     }    
 
+    @Override
     public void addVertices(Vertex... v) {
         this.vertices.addAll(Arrays.asList(v));
     }
 
+    @Override
+    public List<Vertex> getWeightedVerticesByPreference(List<Vertex> mapByDistance, EnumPreferences preferences, EnumTransport transport) {
+
+        List<Vertex> weightedMap = mapByDistance.stream().map((v) -> {
+            v.getChildVerticesAndDistance().entrySet().stream().map((entry) -> {
+                Double weight = preferences.factorDistanceIntoWeight(transport, entry.getValue());
+                entry.setValue(Math.round(weight.floatValue()));
+                return entry;
+            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            return v;
+        }).collect(Collectors.toList());
+
+
+        return weightedMap;
+    }
+
+    @Override
+    public List<Vertex> getVerticesAvailableForTransport(List<Vertex> map, EnumTransport transport) {
+
+        
+
+    }
+
+    @Override
     public Vertex findPlaceByName(String name) {
     
         List<Vertex> graph = this.getVertices();

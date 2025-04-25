@@ -5,16 +5,14 @@ import io.meli.melimaps.enums.EnumTransport;
 public class Path {
     
     private final EnumTransport transport;
-    private final Vertex destination;
     private final Integer distance;
     private final Long timeToReachInMinutes;
     private final Long totalCostInCents;
     private final Boolean ecologic;
     private final Boolean accessible;
 
-    public Path(EnumTransport transport, Vertex destination, Integer distance) {
+    public Path(EnumTransport transport, Integer distance) {
         this.transport = transport;
-        this.destination = destination;
         this.distance = distance;
         this.timeToReachInMinutes = calculateMinutes(distance);
         this.totalCostInCents = calculateCost(distance);
@@ -60,10 +58,6 @@ public class Path {
 
     public Boolean getAccessible() {
         return accessible;
-    }
-
-    public Vertex getDestination() {
-        return destination;
     }
 
 }

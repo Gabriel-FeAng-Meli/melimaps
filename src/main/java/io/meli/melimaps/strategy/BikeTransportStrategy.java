@@ -14,10 +14,10 @@ public class BikeTransportStrategy extends AbstractTransportStrategy {
 
     @Override
     public Route calculateBestRoute(Vertex origin, Vertex destination, List<Vertex> map) {
-
         var result = getShortestPathBetween(origin, destination, map);
-
         return result;
     }
+
+    
     
 }
