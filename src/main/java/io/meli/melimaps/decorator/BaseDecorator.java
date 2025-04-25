@@ -29,26 +29,26 @@ public abstract class BaseDecorator implements TransportStrategy {
 
     @Override
     public Map<String, Route> returnRoutesConsideringPreferences(Vertex origin, Vertex destination, GraphStructure map, Map<String, Route> rawRoutes, List<EnumPreferences> preferences) {
-        Map<String, Route> decoratedRoute = new HashMap<>();
+        Map<String, Route> decoratedRoutes = new HashMap<>();
+        decoratedRoutes.putAll(rawRoutes);
 
         if (preferences.isEmpty()) {
-            return rawRoutes;
+            return decoratedRoutes;
         }
 
         preferences.forEach((preference) -> {
-
             switch (preference) {
-                case ECO: {
-                    this.decoratedStrategy = new EcoDecorator(decoratedStrategy);
-                    break;
-                }
+                case ECO ->  this.decoratedStrategy = new AccessibilityDecorator(decoratedStrategy);
+                case ACCESSIBILITY -> this.decoratedStrategy = new AccessibilityDecorator(decoratedStrategy);
+                case BUDGET -> this.decoratedStrategy = new BudgetDecorator(decoratedStrategy);
+                case TIME -> this.decoratedStrategy = new TimeDecorator(decoratedStrategy);
             }
 
-            decoratedStrategy.calculateBestRoute(origin, destination, map);
-            
-        }
-        );
-        this.allDecoratedRoutes = decoratedRoute;
+            Route newRoute = decoratedStrategy.calculateBestRoute(origin, destination, map);
+            decoratedRoutes.put("Best route considering %s".formatted(preference.name()), newRoute);     
+        });
+
+        this.allDecoratedRoutes = decoratedRoutes;
         
         return allDecoratedRoutes;
     }

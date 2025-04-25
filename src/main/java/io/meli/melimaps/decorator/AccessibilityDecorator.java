@@ -8,9 +8,9 @@ import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.UserPreferences;
 import io.meli.melimaps.model.Vertex;
 
-public class EcoDecorator extends BaseDecorator {
+public class AccessibilityDecorator extends BaseDecorator {
 
-        public EcoDecorator(TransportStrategy decoratedStrategy) {
+        public AccessibilityDecorator(TransportStrategy decoratedStrategy) {
             super(decoratedStrategy);
         }
 
@@ -23,10 +23,8 @@ public class EcoDecorator extends BaseDecorator {
             weightedGraph = map.getGraphWithVerticesAvailableForTransport(transport);
             weightedGraph = weightedGraph.getWeightedGraphByPreference(EnumPreferences.ECO, transport);
 
-            strategy.calculateBestRoute(origin, destination, weightedGraph);
-
         return strategy.calculateBestRoute(origin, destination, weightedGraph);
-        }
+    }
     
     
 }

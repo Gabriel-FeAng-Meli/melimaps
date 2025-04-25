@@ -58,6 +58,11 @@ public class Vertex implements Comparable<Vertex>{
         return pathToChildren;
     }
 
+    public Path getPathToChild(Vertex v) {
+        Path pathToChild = getPathToChildren().get(v);
+        return pathToChild;
+    }
+
     public void setWeightedVerticesInReachOrder(List<Vertex> list) {
         this.weightedVerticesInReachOrder = list;
     }

@@ -29,9 +29,14 @@ public class Graph implements GraphStructure {
     }
 
     @Override
-    public List<Vertex> getWeightedVerticesByPreference(List<Vertex> mapByDistance, EnumPreferences preferences, EnumTransport transport) {
+    public void addVertices(List<Vertex> vertices) {
+        this.vertices.addAll(vertices);
+    }
 
-        List<Vertex> weightedMap = mapByDistance.stream().map((v) -> {
+    @Override
+    public GraphStructure getWeightedGraphByPreference(EnumPreferences preferences, EnumTransport transport) {
+
+        List<Vertex> weightedMap = vertices.stream().map((v) -> {
             v.getChildVerticesAndDistance().entrySet().stream().map((entry) -> {
                 Double weight = preferences.factorDistanceIntoWeight(transport, entry.getValue());
                 entry.setValue(Math.round(weight.floatValue()));
@@ -41,15 +46,26 @@ public class Graph implements GraphStructure {
             return v;
         }).collect(Collectors.toList());
 
+        Graph g = new Graph();
+        g.addVertices(weightedMap);
 
-        return weightedMap;
+        return g;
     }
 
     @Override
-    public List<Vertex> getVerticesAvailableForTransport(List<Vertex> map, EnumTransport transport) {
+    public GraphStructure getGraphWithVerticesAvailableForTransport(EnumTransport transport) {
 
-        
+        List<Vertex> weightedMap = vertices.stream().map((v) -> {
+            v.getChildVerticesAndDistance().entrySet().stream().filter(entry -> v.getPathToChild(entry.getKey()).getTransport() == transport);
 
+            return v;
+        }).collect(Collectors.toList());
+
+        Graph g = new Graph();
+
+        g.addVertices(weightedMap);
+
+        return g;
     }
 
     @Override

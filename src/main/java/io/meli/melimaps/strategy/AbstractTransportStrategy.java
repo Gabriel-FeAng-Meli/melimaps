@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import io.meli.melimaps.enums.EnumPreferences;
 import io.meli.melimaps.enums.EnumTransport;
+import io.meli.melimaps.interfaces.GraphStructure;
 import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
@@ -35,7 +36,7 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
     
 
     @Override
-    public Map<String, Route> returnRoutesConsideringPreferences(Vertex origin, Vertex destination, List<Vertex> map, Map<String, Route> rawRoutes, List<EnumPreferences> preferences) {
+    public Map<String, Route> returnRoutesConsideringPreferences(Vertex origin, Vertex destination, GraphStructure graph, Map<String, Route> rawRoutes, List<EnumPreferences> preferences) {
         Map<String, Route> result = new HashMap<>();
         result.putAll(rawRoutes);
         return result;
@@ -55,7 +56,7 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
     }
 
     @Override
-    public abstract Route calculateBestRoute(Vertex origin, Vertex destination, List<Vertex> map);
+    public abstract Route calculateBestRoute(Vertex origin, Vertex destination, GraphStructure map);
 
     protected String calculateTotalCost(Long costForTransportation) {
 

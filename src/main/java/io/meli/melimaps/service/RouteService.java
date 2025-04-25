@@ -51,10 +51,10 @@ public class RouteService {
 
         Route bestRoute;
 
-        if (routeRepository.existsByTransportAndOriginNameAndDestinationNameAndPathAllIgnoreCase(transport.name(), originName, destinationName)) {
-            bestRoute = routeRepository.findByTransportAndOriginNameAndDestinationNameAndPathAllIgnoreCase(transport.name(), originName, destinationName);
+        if (routeRepository.existsByTransportAndOriginNameAndDestinationNameAllIgnoreCase(transport.name(), originName, destinationName)) {
+            bestRoute = routeRepository.findByTransportAndOriginNameAndDestinationNameAllIgnoreCase(transport.name(), originName, destinationName);
         } else {
-            bestRoute = strategy.calculateBestRoute(origin, destination, graph.getVertices());
+            bestRoute = strategy.calculateBestRoute(origin, destination, graph);
             routeRepository.save(bestRoute);
         }
 

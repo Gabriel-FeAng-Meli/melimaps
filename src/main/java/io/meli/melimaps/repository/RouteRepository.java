@@ -14,8 +14,8 @@ import io.meli.melimaps.model.Route;
 @EnableJpaRepositories
 public interface RouteRepository extends JpaRepository<Route, Integer>{
 
-    Boolean existsByTransportAndOriginNameAndDestinationNameAndPathAllIgnoreCase(String transport, String originName, String destinationName);
+    Boolean existsByTransportAndOriginNameAndDestinationNameAllIgnoreCase(String transport, String originName, String destinationName);
 
-    Route findByTransportAndOriginNameAndDestinationNameAndPathAllIgnoreCase(String transport, String originName, String destinationName);
+    Route findByTransportAndOriginNameAndDestinationNameAllIgnoreCase(String transport, String originName, String destinationName);
     
 }

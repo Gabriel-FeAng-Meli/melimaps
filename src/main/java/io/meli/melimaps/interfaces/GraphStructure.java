@@ -10,9 +10,10 @@ public interface GraphStructure {
 
     List<Vertex> getVertices();
     void addVertices(Vertex... vertices);
+    void addVertices(List<Vertex> vertices);
     Vertex findPlaceByName(String name);
 
-    List<Vertex> getWeightedVerticesByPreference(List<Vertex> mapByDistance, EnumPreferences preferences, EnumTransport transport);
+    GraphStructure getWeightedGraphByPreference(EnumPreferences preferences, EnumTransport transport);
 
-    List<Vertex> getVerticesAvailableForTransport(List<Vertex> map, EnumTransport transport);
+    GraphStructure getGraphWithVerticesAvailableForTransport(EnumTransport transport);
 }
