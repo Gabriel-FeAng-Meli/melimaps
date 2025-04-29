@@ -1,59 +1,36 @@
 package io.meli.melimaps.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import io.meli.melimaps.enums.EnumTransport;
 
 public class Path {
     
-    private final EnumTransport transport;
+    private final List<EnumTransport> transports = new ArrayList<>();
     private final Integer distance;
-    private final Long timeToReachInMinutes;
-    private final Long totalCostInCents;
-    private final Integer ecologicScore;
-    private final Integer badAccessibilityScore;
+    private final Vertex origin;
+    private final Vertex destination;
     private Integer weight;
 
-    public Path(EnumTransport transport, Integer distance) {
-        this.transport = transport;
+    public Path(Vertex origin, Integer distance,  Vertex destination, EnumTransport... transport) {
+        this.transports.add(EnumTransport.FOOT);
+        this.transports.addAll(Arrays.asList(transport));
+        this.origin = origin;
+        this.destination = destination;
         this.distance = distance;
-        this.timeToReachInMinutes = calculateMinutes(distance);
-        this.totalCostInCents = calculateCost(distance);
-        this.ecologicScore = transport.polutionScore();
-        this.badAccessibilityScore = transport.badAccessibilityScore();
-        this.weight = distance;
+        this.weight = Integer.MAX_VALUE;
     }
 
-    private Long calculateMinutes(Integer distanceInKilometers) {
-
-        Long timeInMinutes = Math.round(60 * distanceInKilometers / transport.transportSpeedInKmPerHour().doubleValue());
-        timeInMinutes += transport.minutesStoppedAtEachPoint();
-
-        return timeInMinutes;
-    }
-
-    private Long calculateCost(Integer distance) {
-
-        Double totalCostForTransportation = transport.costPerStop() + distance * transport.costPerKm();
-
-        return Math.round(totalCostForTransportation);
-    }
-
-    public EnumTransport getTransport() {
-        return transport;
+    public List<EnumTransport> getTransports() {
+        return transports;
     }
 
 
     public Integer getDistance() {
         return distance;
     }
-
-    public Long getTimeToReachInMinutes() {
-        return timeToReachInMinutes;
-    }
-
-    public Long getTotalCostInCents() {
-        return totalCostInCents;
-    }
-
 
     public Integer getWeight() {
         return weight;
@@ -63,12 +40,12 @@ public class Path {
         this.weight = weight;
     }
 
-    public Integer getEcologicScore() {
-        return ecologicScore;
+    public Vertex getOrigin() {
+        return origin;
     }
 
-    public Integer getBadAccessibilityScore() {
-        return badAccessibilityScore;
+    public Vertex getDestination() {
+        return destination;
     }
 
 }

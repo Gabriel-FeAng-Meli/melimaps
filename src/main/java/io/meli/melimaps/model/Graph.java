@@ -6,16 +6,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.meli.melimaps.enums.EnumPreferences;
 import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.GraphStructure;
 
 public class Graph implements GraphStructure {
 
-    private final List<Vertex> vertices;
+    private List<Vertex> vertices;
+    private List<Path> allPaths;
+
+    public List<Path> getAllPaths() {
+        return allPaths;
+    }
+
+    public void setAllPathsFromOwnVertices() {
+
+        List<Path> list = new ArrayList<>();
+        vertices.forEach(vertex -> {
+            vertex.getPathToChildren().entrySet().forEach((entry) -> {
+
+            });
+        });
+
+        this.allPaths = list;
+    }
 
     public Graph() {
         this.vertices = new ArrayList<>();
+        this.allPaths = new ArrayList<>();
     }
 
     @Override
@@ -33,38 +50,14 @@ public class Graph implements GraphStructure {
         this.vertices.addAll(vertices);
     }
 
-    @Override
-    public GraphStructure getWeightedGraphByPreference(EnumPreferences preferences, EnumTransport transport) {
+    public void getGraphWithVerticesAvailableForTransport(EnumTransport transport) {
 
         List<Vertex> weightedMap = vertices.stream().map((v) -> {
-            v.getPathToChildren().entrySet().stream().map((entry) -> {
-                Double weight = preferences.factorDistanceIntoWeight(transport, entry.getValue().getDistance());
-                entry.getValue().setWeight(weight.intValue());
-                return entry;
-            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
+            v.setPaths(v.getPathToChildren().entrySet().stream().filter(entry -> entry.getValue().getTransports().contains(transport) || entry.getValue().getTransports().contains(EnumTransport.FOOT)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             return v;
         }).collect(Collectors.toList());
 
-        Graph g = new Graph();
-        g.addVertices(weightedMap);
-
-        return g;
-    }
-
-    @Override
-    public GraphStructure getGraphWithVerticesAvailableForTransport(EnumTransport transport) {
-
-        List<Vertex> weightedMap = vertices.stream().map((v) -> {
-            v.getPathToChildren().entrySet().stream().filter(entry -> entry.getValue().getTransport().equals(transport));
-            return v;
-        }).collect(Collectors.toList());
-
-        Graph g = new Graph();
-
-        g.addVertices(weightedMap);
-
-        return g;
+        this.vertices = weightedMap;
     }
 
     @Override
@@ -88,7 +81,8 @@ public class Graph implements GraphStructure {
         Vertex f = new Vertex("F");
         Vertex g = new Vertex("G");
 
-        a.addChildVertex(b, 4, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        a.addChildVertex(b, 2, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        a.addChildVertex(f, 25, EnumTransport.RAILWAY, EnumTransport.BUS);
         a.addChildVertex(c, 9, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         b.addChildVertex(c, 5, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         b.addChildVertex(d, 3, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
@@ -98,8 +92,8 @@ public class Graph implements GraphStructure {
         d.addChildVertex(f, 22, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         e.addChildVertex(f, 5, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         
-        a.addChildVertex(g, 10, EnumTransport.RAILWAY);
-        g.addChildVertex(f, 5, EnumTransport.RAILWAY);
+        a.addChildVertex(g, 15, EnumTransport.RAILWAY, EnumTransport.BUS);
+        g.addChildVertex(f, 5, EnumTransport.RAILWAY, EnumTransport.BUS);
 
 
         map.addVertices(a, b, c, d, e, f, g);

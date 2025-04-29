@@ -5,17 +5,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 
-import io.meli.melimaps.model.CompleteRoute;
+import io.meli.melimaps.model.Route;
+
 
 
 
 
 @Repository
 @EnableJpaRepositories
-public interface RouteRepository extends JpaRepository<CompleteRoute, Integer>{
+public interface RouteRepository extends JpaRepository<Route, Integer>{
 
-    Boolean existsByTransportAndOriginNameAndDestinationNameAllIgnoreCase(String transport, String originName, String destinationName);
-
-    CompleteRoute findByTransportAndOriginNameAndDestinationNameAllIgnoreCase(String transport, String originName, String destinationName);
+    Route findByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(String prioritize, String transport, String originName, String destinationName);
+    Boolean existsByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(String prioritize, String transport, String originName, String destinationName);
     
 }

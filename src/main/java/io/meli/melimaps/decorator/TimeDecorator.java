@@ -1,31 +1,59 @@
 package io.meli.melimaps.decorator;
 
-import io.meli.melimaps.enums.EnumPreferences;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
+
+import io.meli.melimaps.enums.EnumPreference;
 import io.meli.melimaps.enums.EnumTransport;
-import io.meli.melimaps.factories.TransportStrategyFactory;
 import io.meli.melimaps.interfaces.GraphStructure;
-import io.meli.melimaps.interfaces.TransportStrategy;
-import io.meli.melimaps.model.CompleteRoute;
-import io.meli.melimaps.model.UserPreferences;
+import io.meli.melimaps.model.Path;
+import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
 public class TimeDecorator extends BaseDecorator {
 
-        public TimeDecorator(TransportStrategy decoratedStrategy, EnumTransport transport) {
-            super(decoratedStrategy, transport);
+    public TimeDecorator(EnumTransport transport) {
+        this.transport = transport;
+        this.priority = EnumPreference.TIME;
+    }
+
+    @Override
+    public Route calculateBestRoute(Vertex origin, Vertex destination, GraphStructure map) {
+        return getOptimalPathBetween(origin, destination, map.getVertices());
+    }
+
+    @Override
+    public List<Route> calculateMostOptimalPathToEachVertex(Vertex source, List<Vertex> map) {
+        source.setWeight(0);
+
+        Set<Vertex> settledNodes = new HashSet<>();
+        Queue<Vertex> unsettledNodes = new PriorityQueue<>(Set.of(source));
+
+        while (!unsettledNodes.isEmpty()) {
+            Vertex current = unsettledNodes.poll();
+            current.getPathToChildren().entrySet().stream().filter(
+                    entry -> !settledNodes.contains(entry.getKey())).forEach(entry -> {
+                        Vertex v = entry.getKey();
+                        Path p = entry.getValue();
+
+                        Integer factorOfTransportChoice = transport.factorTransportPreference(p.getTransports());
+                        Double factorOfPreferenceSpeed = p.getDistance().doubleValue() / transport.transportSpeedInKmPerHour().doubleValue();
+                        Integer factorOfTime = factorOfPreferenceSpeed.intValue() + 1;
+
+                        p.setWeight(p.getDistance() * factorOfTransportChoice * factorOfTime);
+
+                        evaluatePathWeight(v, current);
+                        unsettledNodes.add(v);
+                    });
+
+            settledNodes.add(current);
         }
 
-        @Override
-        public CompleteRoute calculateBestRoute(Vertex origin, Vertex destination, GraphStructure map) {
-            TransportStrategyFactory factory = new TransportStrategyFactory();
-            UserPreferences p = new UserPreferences(transport.name(), false, false, false);
-            TransportStrategy strategy = factory.instantiateRightStrategy(p);
-            GraphStructure weightedGraph;
-            weightedGraph = map.getGraphWithVerticesAvailableForTransport(transport);
-            weightedGraph = weightedGraph.getWeightedGraphByPreference(EnumPreferences.TIME, transport);
+        return returnOptimalRoutesOnTheMap(source, map);
+    }
 
-        return strategy.calculateBestRoute(origin, destination, weightedGraph);
-        }
-    
     
 }

@@ -11,18 +11,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.meli.melimaps.enums.EnumPreferences;
+import io.meli.melimaps.enums.EnumPreference;
 import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.GraphStructure;
 import io.meli.melimaps.interfaces.TransportStrategy;
-import io.meli.melimaps.model.CompleteRoute;
+import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
 public abstract class AbstractTransportStrategy implements TransportStrategy {
 
     protected EnumTransport type;
 
-    protected List<EnumPreferences> preferences;
+    protected Route optimalRoute;
 
     @Override
     public EnumTransport getStrategyType() {
@@ -32,28 +32,22 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
     public void setTransport(EnumTransport transport) {
         this.type = transport;
     }
-    
 
-    @Override
-    public Map<String, CompleteRoute> returnRoutesConsideringPreferences(Vertex origin, Vertex destination, GraphStructure graph, Map<String, CompleteRoute> rawRoutes, List<EnumPreferences> preferences) {
-        return rawRoutes;
-    }
-
-    protected Map<String, CompleteRoute> applyPreferenceToRoute(CompleteRoute route, EnumPreferences preference) {
-        Map<String, CompleteRoute> result = new HashMap<>();
+    protected Map<String, Route> applyPreferenceToRoute(Route route, EnumPreference preference) {
+        Map<String, Route> result = new HashMap<>();
         result.put("Best route considering %s : ".formatted(preference.name()), route);
         return result;
     }
 
-    protected CompleteRoute getShortestPathBetween(Vertex source, Vertex destination, List<Vertex> map) {
-        CompleteRoute bestRoute = calculateShortestPathToEachVertex(source, map).stream()
+    protected Route getShortestPathBetween(Vertex source, Vertex destination, List<Vertex> map) {
+        Route bestRoute = calculateShortestPathToEachVertex(source, map).stream()
                 .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName()) && route.getOriginName().equalsIgnoreCase(source.getName())).findFirst().orElseThrow();
 
         return bestRoute;
     }
 
     @Override
-    public abstract CompleteRoute calculateBestRoute(Vertex origin, Vertex destination, GraphStructure map);
+    public abstract Route calculateBestRoute(Vertex origin, Vertex destination, GraphStructure map);
 
     protected String calculateTotalCost(Long costForTransportation) {
 
@@ -64,53 +58,59 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
         return cost;
     }
 
-
-    protected Long calculateMinutes(Integer distanceInKilometers) {
-
-        Long timeInMinutes = Math.round(60 * distanceInKilometers / type.transportSpeedInKmPerHour().doubleValue());
-        timeInMinutes += type.minutesStoppedAtEachPoint();
-
-        return timeInMinutes;
-    }
-
-    protected Long calculateCost(Integer distance) {
-
-        Double totalCostForTransportation = type.costPerStop() + distance * type.costPerKm();
-
-        return Math.round(totalCostForTransportation);
-    }
-
-
     protected String calculateTimeToTravel(Long timeInMinutes) {
         
 
-        Long minutes = timeInMinutes % 60;
-        Long hours = (timeInMinutes - minutes) / 60;
+        Long min = timeInMinutes;
 
 
-        String result = String.format("%s hours and %s minutes", hours, minutes);
+        String result = String.format("%s minutes", min);
 
         return result;
     }
+    
+    private Long minutes;
+    private Long cents;
+    private String estimatedTime;
+    private String estimatedCost;
+    private Integer distance;
 
-    protected List<CompleteRoute> returnAllPossibleRoutesFromSource(Vertex source, List<Vertex> weightedMap) {
+    protected List<Route> returnOptimalRoutesOnTheMap(Vertex source, List<Vertex> weightedMap) {
 
-        List<CompleteRoute> paths = new ArrayList<>();
+        List<Route> paths = new ArrayList<>();
         weightedMap.forEach(node -> {
 
-            String path = node.getWeightedVerticesInReachOrder().stream().map((vertex) -> {
-                return vertex.getName();
-            }).collect(Collectors.joining(" -> "));
+            distance = 0;
+            minutes = 0L;
+            cents = 0L;
+            estimatedCost = "";
+            estimatedTime = "";
 
-            String routePath = "%s -> %s".formatted(path, node.getName());
-            String distance = "%s kilometers".formatted(node.getWeight());
-            Long minutes = calculateMinutes(source.getPathToChild(node).getDistance());
-            Long cents = calculateCost(node.getWeight());
-            String estimatedTime = calculateTimeToTravel(minutes);
-            String estimatedCost = calculateTotalCost(cents);
+            String pathString = node.getPathsInReachOrder()
+                .stream().map((path) -> {
 
-            CompleteRoute routeToNode = new CompleteRoute(type, source.getName(), node.getName(), distance, estimatedTime,
-                    estimatedCost, routePath);
+                    EnumTransport transportUsedOnPath = EnumTransport.FOOT;
+                    if (path.getTransports().contains(type)) {
+                        transportUsedOnPath = type;
+                    }
+
+                    cents += type.costPerKmInCents() * path.getDistance();
+                    cents += type.costPerStopInCents();
+
+                    distance += path.getDistance();
+
+                    minutes += type.minutesStoppedAtEachPoint();
+                    minutes += 60 * path.getDistance() / type.transportSpeedInKmPerHour();
+
+                    String pathing = ": (%s) from %s to %s for %s kilometers :".formatted(transportUsedOnPath, path.getOrigin().getName(), path.getDestination().getName(), path.getDistance());
+                    return pathing;
+                }).collect(Collectors.joining(" -> "));
+
+            estimatedCost = calculateTotalCost(cents);
+            estimatedTime = calculateTimeToTravel(minutes);
+
+            Route routeToNode = new Route(type, source.getName(), node.getName(), "%s kilometers".formatted(distance), estimatedTime,
+                    estimatedCost, pathString);
 
             paths.add(routeToNode);
         });
@@ -118,7 +118,7 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
     }
 
     protected void evaluatePathWeight(Vertex childVertex, Vertex parentVertex) {
-        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathToChild(childVertex).getWeight();
+        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathToChild(childVertex).getDistance();
         if (newWeight < childVertex.getWeight()) {
             childVertex.setWeight(newWeight);
             childVertex.setPathsInReachOrder(Stream
@@ -126,7 +126,7 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
         }
     }
 
-    protected List<CompleteRoute> calculateShortestPathToEachVertex(Vertex source, List<Vertex> map) {
+    protected List<Route> calculateShortestPathToEachVertex(Vertex source, List<Vertex> map) {
         source.setWeight(0);
 
         Set<Vertex> settledNodes = new HashSet<>();
@@ -134,16 +134,19 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
 
         while (!unsettledNodes.isEmpty()) {
             Vertex current = unsettledNodes.poll();
-            current.getPathToChildren().entrySet().stream().filter(
+
+            current.getPathToChildren().entrySet().stream().filter(entry -> entry.getValue().getTransports().contains(type)).filter(
                     entry -> !settledNodes.contains(entry.getKey())).forEach(entry -> {
-                        evaluatePathWeight(entry.getKey(), current);
-                        unsettledNodes.add(entry.getKey());
+
+                            evaluatePathWeight(entry.getKey(), current);
+                            unsettledNodes.add(entry.getKey());
+    
                     });
 
             settledNodes.add(current);
         }
 
-        return returnAllPossibleRoutesFromSource(source, map);
+        return returnOptimalRoutesOnTheMap(source, map);
     }
 
 }

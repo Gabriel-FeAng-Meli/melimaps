@@ -10,14 +10,13 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.meli.melimaps.decorator.BaseDecorator;
-import io.meli.melimaps.enums.EnumPreferences;
+import io.meli.melimaps.enums.EnumPreference;
 import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.factories.TransportStrategyFactory;
 import io.meli.melimaps.interfaces.TransportStrategy;
-import io.meli.melimaps.model.CompleteRoute;
 import io.meli.melimaps.model.Graph;
+import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.User;
-import io.meli.melimaps.model.UserPreferences;
 import io.meli.melimaps.model.Vertex;
 import io.meli.melimaps.repository.RouteRepository;
 import io.swagger.v3.core.util.Json;
@@ -28,8 +27,7 @@ public class RouteService {
     @Autowired
     private RouteRepository routeRepository;
 
-    @Autowired
-    private TransportStrategyFactory transportStrategyFactory;
+    private final TransportStrategyFactory transportStrategyFactory = new TransportStrategyFactory();
 
     @Autowired
     private UserService userService;
@@ -38,43 +36,58 @@ public class RouteService {
     private Vertex origin;
     private Vertex destination;
 
+    Graph graph = new Graph().build();
 
-    public String generateOptimalRouteForUser(Integer userId, String originName, String destinationName, List<EnumPreferences> preferenceList) throws JsonProcessingException {
+    public String generateOptimalRouteForUser(Integer userId, String originName, String destinationName, List<EnumPreference> preferenceList) throws JsonProcessingException {
 
-        Graph graph = new Graph().build();
-
+        
         User user = userService.getUserById(userId);
-        UserPreferences preferences = new UserPreferences(user.getTransport(), user.getEcologic(), user.getAccessibility(), false);
 
-        TransportStrategy strategy = transportStrategyFactory.instantiateRightStrategy(preferences);
+        if (user.getTransport().isEmpty()) {
+            user.setTransport("ANY");
+        }
+
+        TransportStrategy strategy = transportStrategyFactory.instantiateRightStrategy(EnumTransport.valueOf(user.getTransport()), preferenceList);
 
         transport = strategy.getStrategyType();
         origin = graph.findPlaceByName(originName);
         destination = graph.findPlaceByName(destinationName);
 
-        Map<String, CompleteRoute> recommendedRoutes = new HashMap<>();
+        graph.getGraphWithVerticesAvailableForTransport(transport);
 
-        CompleteRoute bestRoute;
-
-        // if (routeRepository.existsByTransportAndOriginNameAndDestinationNameAllIgnoreCase(transport.name(), originName, destinationName)) {
-        //     bestRoute = routeRepository.findByTransportAndOriginNameAndDestinationNameAllIgnoreCase(transport.name(), originName, destinationName);
-        // } else {
-            bestRoute = strategy.calculateBestRoute(origin, destination, graph);
-        // routeRepository.save(bestRoute);
-        // }
-
-        recommendedRoutes.put("Best route considering DISTANCE: ", bestRoute);
+        Map<String, Route> recommendedRoutes = new HashMap<>();
 
         if (!preferenceList.isEmpty()) {
             
-            BaseDecorator decoration = new BaseDecorator(strategy, transport);
+            List<Route> decoratedRoutes = BaseDecorator.calculateRoutesForEachPreference(transport, preferenceList, origin, destination, graph);
+            decoratedRoutes.forEach(route -> {
+
+                recommendedRoutes.put("Best route considering %s".formatted(route.getPrioritize()), route);
+            });
             
-            recommendedRoutes.putAll(decoration.returnRoutesConsideringPreferences(origin, destination, graph, recommendedRoutes, preferenceList));
         }
+        
+        Route bestRoute = getOrCalculateAndSaveBestRoute(strategy, originName, destinationName, originName);
+        
+        recommendedRoutes.put("Best route considering DISTANCE: ", bestRoute);
+        
         
         String result = Json.mapper().writeValueAsString(recommendedRoutes);
 
         return result;
+    }
+
+    private Route getOrCalculateAndSaveBestRoute(TransportStrategy strategy, String originName, String destinationName, String prioritize) {
+
+        Route bestRoute;
+        if (routeRepository.existsByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(prioritize, transport.name(), originName, destinationName)) {
+            bestRoute = routeRepository.findByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(prioritize, transport.name(), originName, destinationName);
+        } else {
+            bestRoute = strategy.calculateBestRoute(origin, destination, graph);
+            routeRepository.save(bestRoute);
+        }
+        return bestRoute;
+        
     }
 
     
