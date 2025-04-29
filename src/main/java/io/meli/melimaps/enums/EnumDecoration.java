@@ -6,7 +6,7 @@ import io.meli.melimaps.decorator.BudgetDecorator;
 import io.meli.melimaps.decorator.EcoDecorator;
 import io.meli.melimaps.decorator.TimeDecorator;
 
-public enum EnumPreference {
+public enum EnumDecoration {
     DISTANCE,
     ECO,
     BUDGET,

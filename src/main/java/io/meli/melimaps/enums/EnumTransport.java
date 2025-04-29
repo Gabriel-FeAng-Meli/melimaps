@@ -33,14 +33,14 @@ public enum EnumTransport {
 
     public boolean isEco() {
         return switch (this) {
-            case RAILWAY, BIKE, FOOT -> true;
-            default -> false;
+            case CAR -> false;
+            default -> true;
         };
     }
 
     public boolean isAccessible() {
         return switch(this) {
-            case CAR, BUS, RAILWAY -> true;
+            case CAR, RAILWAY, BUS -> true;
             default -> false;
         };
     }
@@ -65,8 +65,8 @@ public enum EnumTransport {
         return switch(this) {
             case ANY -> null;
             case CAR, FOOT, BIKE -> 0;
-            case BUS -> 55;
-            case RAILWAY -> 50;
+            case BUS -> 15;
+            case RAILWAY -> 5;
         };
     }
 
@@ -74,7 +74,7 @@ public enum EnumTransport {
         return switch (this) {
             case ANY -> null;
             case CAR -> 80;
-            case BUS -> 80;
+            case BUS -> 40;
             case RAILWAY -> 120;
             case FOOT -> 4;
             case BIKE -> 18;
@@ -86,9 +86,9 @@ public enum EnumTransport {
             case ANY -> null;
             case CAR -> 1;
             case BIKE -> 100;
-            case BUS -> 1;
+            case BUS -> 2;
             case FOOT -> 100;
-            case RAILWAY -> 1;
+            case RAILWAY -> 2;
         };
     }
 

@@ -6,7 +6,7 @@ import java.util.List;
 
 import io.meli.melimaps.enums.EnumTransport;
 
-public class Path {
+public class Path implements Comparable<Path>{
     
     private final List<EnumTransport> transports = new ArrayList<>();
     private final Integer distance;
@@ -46,6 +46,11 @@ public class Path {
 
     public Vertex getDestination() {
         return destination;
+    }
+
+    @Override
+    public int compareTo(Path path) {
+        return Integer.compare(this.weight, path.getWeight());
     }
 
 }

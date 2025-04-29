@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import io.meli.melimaps.enums.EnumTransport;
 
@@ -13,7 +12,7 @@ public class Vertex implements Comparable<Vertex>{
     private final String name;
     private Integer weight;
     private List<Path> pathsInReachOrder;
-    private Map<Vertex, Path> pathToChildren;
+    private Map<Path, Integer> pathToChildren;
 
     public Vertex(String name) {
         this.name = name;
@@ -23,12 +22,11 @@ public class Vertex implements Comparable<Vertex>{
     }
 
     public void addChildVertex(Vertex vertex, int distance, EnumTransport... transports) {
-
         Path path = new Path(this, distance, vertex, transports);
-        pathToChildren.put(vertex, path);
+        pathToChildren.put(path, path.getWeight());
     }
 
-    public void setPaths(Map<Vertex, Path> paths) {
+    public void setPaths(Map<Path, Integer> paths) {
         this.pathToChildren = paths;
     }
 
@@ -49,22 +47,20 @@ public class Vertex implements Comparable<Vertex>{
         this.weight = distance;
     }
 
-    public Map<Vertex, Path> getPathToChildren() {
+    public Map<Path, Integer> getPathToChildren() {
         return pathToChildren;
     }
 
-    public Path getPathToChild(Vertex v) {
-        Path pathToChild = getPathToChildren().get(v);
-        return pathToChild;
+    public Path getPathsToChild(Vertex v) {
+
+        Path pathsToChild = this.getPathToChildren().entrySet().stream().filter(entry -> entry.getKey().getDestination().equals(v)).map(entry -> {
+            return entry.getKey();
+        }).findAny().get();
+        return pathsToChild;
     }
 
     public void removePath(Path path) {
 
-        Map<Vertex, Path> paths = this.pathToChildren;
-
-        paths = paths.entrySet().stream().filter(entry -> !entry.getValue().equals(path)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        this.pathToChildren = paths;
     }
 
     public List<Path> getPathsInReachOrder() {

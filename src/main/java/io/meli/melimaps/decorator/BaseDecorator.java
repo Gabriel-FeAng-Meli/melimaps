@@ -2,46 +2,63 @@ package io.meli.melimaps.decorator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import io.meli.melimaps.enums.EnumPreference;
+import io.meli.melimaps.enums.EnumDecoration;
 import io.meli.melimaps.enums.EnumTransport;
-import io.meli.melimaps.interfaces.GraphStructure;
-import io.meli.melimaps.interfaces.TransportStrategy;
+import io.meli.melimaps.interfaces.OptimizationInterface;
+import io.meli.melimaps.model.Path;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
-public abstract class BaseDecorator implements TransportStrategy {
+public abstract class BaseDecorator implements OptimizationInterface {
 
     protected EnumTransport transport;
-    protected EnumPreference priority;
+    protected EnumDecoration priority;
+    protected Integer factorPerKm;
+    protected Integer factorPerStop;
+    protected Vertex destination;
 
     @Override
     public EnumTransport getStrategyType() {
         return this.transport;
     };
 
-    public static List<Route> calculateRoutesForEachPreference(EnumTransport transport, List<EnumPreference> preferences, Vertex origin, Vertex destination, GraphStructure map) {
+    public List<Route> calculateMostOptimalPathToEachVertex(Vertex source, List<Vertex> map) {
 
-        List<Route> routes = new ArrayList<>();
+        Set<Path> settledPaths = new HashSet<>();
+        Queue<Path> unsettledPaths = new PriorityQueue<>(source.getPathToChildren().keySet());
 
-        preferences.forEach(preference -> {
-            BaseDecorator decorator = preference.chooseDecorator(transport);
+        while (!unsettledPaths.isEmpty()) {
+            Path current = unsettledPaths.poll();
+            
+            current.getOrigin().getPathToChildren().entrySet().stream().filter(
+                    entry -> !settledPaths.contains(entry.getKey())).forEach(entry -> {
+                        Vertex v = entry.getKey().getDestination();
+                        Path p = entry.getKey();
 
-            if (decorator != null) {
-                
-                routes.add(decorator.calculateBestRoute(origin, destination, map));
-            }
-        });
+                        Integer weight = p.getDistance() * factorPerKm + factorPerStop;
 
-        return routes;
+                        current.setWeight(weight);
 
+                        OptimizationInterface.evaluatePathWeight(v, current.getOrigin());
+                        
+                        unsettledPaths.add(p);
+                    });
+            settledPaths.add(current);
+        }
+
+        return returnOptimalRoutesOnTheMap(source, map);
     }
 
     protected Route getOptimalPathBetween(Vertex source, Vertex destination, List<Vertex> map) {
+        this.destination = destination;
         List<Route> routesBetweenVertices = calculateMostOptimalPathToEachVertex(source, map);
         routesBetweenVertices = routesBetweenVertices.stream()
             .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName()) && route.getOriginName().equalsIgnoreCase(source.getName())).toList();
@@ -51,8 +68,7 @@ public abstract class BaseDecorator implements TransportStrategy {
         return bestRoute;
     }
 
-
-    protected Map<String, Route> applyPreferenceToRoute(Route route, EnumPreference preference) {
+    protected Map<String, Route> applyPreferenceToRoute(Route route, EnumDecoration preference) {
         Map<String, Route> result = new HashMap<>();
         result.put("Best route considering %s : ".formatted(preference.name()), route);
         return result;
@@ -68,7 +84,6 @@ public abstract class BaseDecorator implements TransportStrategy {
         weightedMap.forEach(node -> {
             String pathString = node.getPathsInReachOrder()
                 .stream().map((path) -> {
-
                     EnumTransport transportUsedOnPath = EnumTransport.FOOT;
                     if (path.getTransports().contains(transport)) {
                         transportUsedOnPath = transport;
@@ -76,22 +91,26 @@ public abstract class BaseDecorator implements TransportStrategy {
 
                     String pathing = ": (%s) from %s to %s for %s kilometers :".formatted(transportUsedOnPath, path.getOrigin().getName(), path.getDestination().getName(), path.getDistance());
 
-                    cost += transport.costPerKmInCents() * path.getDistance();
-                    cost += transport.costPerStopInCents();
+                    cost += transportUsedOnPath.costPerKmInCents() * path.getDistance();
+                    cost += transportUsedOnPath.costPerStopInCents();
 
                     kilometers += path.getDistance();
 
-                    minutes += transport.minutesStoppedAtEachPoint();
-                    minutes += 60 * path.getDistance() / transport.transportSpeedInKmPerHour();
+                    minutes += transportUsedOnPath.minutesStoppedAtEachPoint();
+                    minutes += 60 * path.getDistance() / transportUsedOnPath.transportSpeedInKmPerHour();
 
                     return pathing;
                 }).collect(Collectors.joining(" -> "));
 
-        String totalCost = "%s cents".formatted(cost);
-        String totalTime = "%s minutes".formatted(minutes);
-        String totalDistance = "%s kilometers".formatted(kilometers);
-
-        Route routeToNode = new Route(0, transport.name(), source.getName(), node.getName(), totalDistance, totalTime, totalCost, pathString, priority.name());
+            Route routeToNode = new Route.Builder()
+                .transport(transport)
+                .originName(source)
+                .destinationName(destination)
+                .distance(kilometers)
+                .totalCost(cost.longValue())
+                .timeToReach(minutes.longValue())
+                .path(pathString)
+                .build();
 
         paths.add(routeToNode);
 
@@ -101,16 +120,5 @@ public abstract class BaseDecorator implements TransportStrategy {
         });
         return paths;
     }
-
-    protected void evaluatePathWeight(Vertex childVertex, Vertex parentVertex) {
-        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathToChild(childVertex).getWeight();
-        if (newWeight < childVertex.getWeight()) {
-            childVertex.setWeight(newWeight);
-            childVertex.setPathsInReachOrder(Stream
-                    .concat(parentVertex.getPathsInReachOrder().stream(), Stream.of(parentVertex.getPathToChild(childVertex))).toList());
-        }
-    }
-
-    protected abstract List<Route> calculateMostOptimalPathToEachVertex(Vertex v, List<Vertex> map);
 
 }

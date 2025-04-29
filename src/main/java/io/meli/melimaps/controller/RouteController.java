@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import io.meli.melimaps.enums.EnumPreference;
+import io.meli.melimaps.enums.EnumDecoration;
 import io.meli.melimaps.model.RequestOptimalRoute;
 import io.meli.melimaps.service.RouteService;
 
@@ -26,10 +26,10 @@ public class RouteController {
     private RouteService routeService;
 
     @PostMapping
-    public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req, @RequestParam(required=false, defaultValue="DISTANCE") EnumPreference... preferences) throws JsonProcessingException {
+    public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req, @RequestParam(required=false, defaultValue="TIME") EnumDecoration... decorations) throws JsonProcessingException {
         
 
-        List<EnumPreference> preferenceList = Arrays.asList(preferences);
+        List<EnumDecoration> preferenceList = Arrays.asList(decorations);
         var result = routeService.generateOptimalRouteForUser(req.userId(), req.originName(), req.destinationName(), preferenceList);
 
 
