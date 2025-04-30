@@ -9,15 +9,17 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.meli.melimaps.enums.EnumDecoration;
 import io.meli.melimaps.enums.EnumTransport;
-import io.meli.melimaps.interfaces.OptimizationInterface;
+import io.meli.melimaps.interfaces.Graph;
+import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Path;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
-public abstract class BaseDecorator implements OptimizationInterface {
+public abstract class BaseDecorator implements TransportStrategy {
 
     protected EnumTransport transport;
     protected EnumDecoration priority;
@@ -29,27 +31,55 @@ public abstract class BaseDecorator implements OptimizationInterface {
     public EnumTransport getStrategyType() {
         return this.transport;
     };
+    
+    public static List<Route> calculateRoutesForEachPreference(EnumTransport transport, List<EnumDecoration> preferences, Vertex origin, Vertex destination, Graph map) {
+
+        List<Route> routes = new ArrayList<>();
+
+        preferences.forEach(preference -> {
+            BaseDecorator decorator = preference.chooseDecorator(transport);
+
+            if (decorator != null) {
+                
+                routes.add(decorator.calculateBestRoute(origin, destination, map));
+            }
+        });
+
+        return routes;
+
+    }
+
+    protected void evaluatePathWeight(Vertex childVertex, Vertex parentVertex) {
+        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathToChild(childVertex).getWeight();
+        if (newWeight < childVertex.getWeight()) {
+            childVertex.setWeight(newWeight);
+            childVertex.setPathsInReachOrder(Stream
+                    .concat(parentVertex.getPathsInReachOrder().stream(), Stream.of(parentVertex.getPathToChild(childVertex))).toList());
+        }
+    }
+
 
     public List<Route> calculateMostOptimalPathToEachVertex(Vertex source, List<Vertex> map) {
+        source.setWeight(0);
 
-        Set<Path> settledPaths = new HashSet<>();
-        Queue<Path> unsettledPaths = new PriorityQueue<>(source.getPathToChildren().keySet());
+        Set<Vertex> settledPaths = new HashSet<>();
+        Queue<Vertex> unsettledPaths = new PriorityQueue<>(Set.of(source));
 
         while (!unsettledPaths.isEmpty()) {
-            Path current = unsettledPaths.poll();
+            Vertex current = unsettledPaths.poll();
             
-            current.getOrigin().getPathToChildren().entrySet().stream().filter(
+            current.getPathToChildren().entrySet().stream().filter(
                     entry -> !settledPaths.contains(entry.getKey())).forEach(entry -> {
-                        Vertex v = entry.getKey().getDestination();
-                        Path p = entry.getKey();
+                        Vertex v = entry.getKey();
+                        Path p = entry.getValue();
 
                         Integer weight = p.getDistance() * factorPerKm + factorPerStop;
 
                         current.setWeight(weight);
 
-                        OptimizationInterface.evaluatePathWeight(v, current.getOrigin());
+                        evaluatePathWeight(v, current);
                         
-                        unsettledPaths.add(p);
+                        unsettledPaths.add(v);
                     });
             settledPaths.add(current);
         }

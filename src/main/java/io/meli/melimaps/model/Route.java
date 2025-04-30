@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.meli.melimaps.enums.EnumDecoration;
 import io.meli.melimaps.enums.EnumTransport;
-import io.meli.melimaps.interfaces.OptimizationInterface;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -106,7 +105,7 @@ public class Route {
             return this;
         }
         public Builder timeToReach(Long timeToReach) {
-            this.timeToReach = OptimizationInterface.calculateTimeToTravel(timeToReach);
+            this.timeToReach = timeToReach.toString();
             return this;
         }
 
@@ -115,7 +114,7 @@ public class Route {
             return this;
         }
         public Builder totalCost(Long totalCost) {
-            this.totalCost = OptimizationInterface.calculateTotalCost(totalCost);
+            this.totalCost = totalCost.toString();
             return this;
         }
 

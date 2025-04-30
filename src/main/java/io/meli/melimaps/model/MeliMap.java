@@ -36,7 +36,7 @@ public class MeliMap implements Graph {
     public void getGraphWithVerticesAvailableForTransport(final EnumTransport transport) {
 
         final List<Vertex> weightedMap = vertices.stream().map((v) -> {
-            v.setPaths(v.getPathToChildren().entrySet().stream().filter(entry -> entry.getKey().getTransports().contains(transport)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+            v.setPaths(v.getPathToChildren().entrySet().stream().filter(entry -> entry.getValue().getTransports().contains(transport)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             return v;
         }).collect(Collectors.toList());
 

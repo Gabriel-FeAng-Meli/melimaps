@@ -95,11 +95,11 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
         while (!unsettledNodes.isEmpty()) {
             Vertex current = unsettledNodes.poll();
 
-            current.getPathToChildren().entrySet().stream().filter(entry -> entry.getKey().getTransports().contains(type)).filter(
-                    entry -> !settledNodes.contains(entry.getKey().getDestination())).forEach(entry -> {
+            current.getPathToChildren().entrySet().stream().filter(
+                    entry -> !settledNodes.contains(entry.getKey())).forEach(entry -> {
 
-                            evaluatePathWeight(entry.getKey().getDestination(), current);
-                            unsettledNodes.add(entry.getKey().getDestination());
+                            evaluatePathWeight(current, entry.getKey());
+                            unsettledNodes.add(entry.getKey());
     
                     });
 
@@ -109,12 +109,12 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
         return returnOptimalRoutesOnTheMap(source, map);
     }
 
-        protected void evaluatePathWeight(Vertex childVertex, Vertex parentVertex) {
-        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathsToChild(childVertex).getWeight();
+    protected void evaluatePathWeight(Vertex childVertex, Vertex parentVertex) {
+        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathToChild(childVertex).getWeight();
         if (newWeight < childVertex.getWeight()) {
-            parentVertex.getPathsToChild(childVertex).setWeight(newWeight);
+            parentVertex.getPathToChild(childVertex).setWeight(newWeight);
             childVertex.setWeight(newWeight);
-            childVertex.setPathsInReachOrder(Stream.concat(parentVertex.getPathsInReachOrder().stream(), Stream.of(parentVertex.getPathsToChild(childVertex))).toList());
+            childVertex.setPathsInReachOrder(Stream.concat(parentVertex.getPathsInReachOrder().stream(), Stream.of(parentVertex.getPathToChild(childVertex))).toList());
         }
     }
 
