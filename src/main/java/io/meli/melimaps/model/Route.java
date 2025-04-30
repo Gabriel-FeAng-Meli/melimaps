@@ -1,5 +1,8 @@
 package io.meli.melimaps.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.meli.melimaps.enums.EnumTransport;
@@ -7,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 public class Route {
@@ -24,6 +28,10 @@ public class Route {
     private String timeToReach;
     private String totalCost;
     private String path;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "user")
+    private List<User> favoritedBy = new ArrayList<>();
     
     public Route(Integer id, String transport, String originName, String destinationName, String distance,
     String timeToReach, String totalCost, String path, String prioritize) {
@@ -107,5 +115,13 @@ public class Route {
 
     public void setPrioritize(String prioritize) {
         this.prioritize = prioritize;
+    }
+
+    public List<User> getFavoritedBy() {
+        return favoritedBy;
+    }
+
+    public void setFavoritedBy(List<User> favoritedBy) {
+        this.favoritedBy = favoritedBy;
     }
 }

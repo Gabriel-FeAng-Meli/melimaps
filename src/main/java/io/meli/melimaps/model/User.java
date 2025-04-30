@@ -1,9 +1,14 @@
 package io.meli.melimaps.model;
 
+import java.util.Map;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 public class User {
@@ -15,16 +20,25 @@ public class User {
     private String name;
 
     private String transport;
+    
+    private Boolean hurry = false;
 
-    private Boolean accessibility;
+    private Boolean accessibility = false;
 
-    private Boolean ecologic;
+    private Boolean ecologic = false;
+    
+    private Boolean budget = false;
 
-    public User(String name, String transport, Boolean accessibility, Boolean ecologic) {
+    @ManyToMany
+    @JoinTable(name = "route", joinColumns = @JoinColumn(name="route_id"), inverseJoinColumns = @JoinColumn(name="user_id"))
+    private Map<Route, Integer> favoriteRoutes;
+
+    public User(String name, String transport, Boolean accessibility, Boolean ecologic, Boolean budget) {
         this.name = name;
         this.transport = transport;
         this.accessibility = accessibility;
         this.ecologic = ecologic;
+        this.budget = budget;
     }
     
     public User() {
@@ -69,5 +83,29 @@ public class User {
 
     public void setEcologic(Boolean ecologic) {
         this.ecologic = ecologic;
+    }
+
+    public Boolean getBudget() {
+        return budget;
+    }
+
+    public void setBudget(Boolean budget) {
+        this.budget = budget;
+    }
+
+    public Boolean getHurry() {
+        return hurry;
+    }
+
+    public void setHurry(Boolean hurry) {
+        this.hurry = hurry;
+    }
+
+    public Map<Route, Integer> getFavoriteRoutes() {
+        return favoriteRoutes;
+    }
+
+    public void setFavoriteRoutes(Map<Route, Integer> favoriteRoutes) {
+        this.favoriteRoutes = favoriteRoutes;
     }
 }

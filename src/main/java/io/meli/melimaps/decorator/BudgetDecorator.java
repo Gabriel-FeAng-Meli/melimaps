@@ -1,23 +1,22 @@
 package io.meli.melimaps.decorator;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
 import io.meli.melimaps.enums.EnumPreference;
-import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.GraphStructure;
+import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Path;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
-public class BudgetDecorator extends BaseDecorator {
+public class BudgetDecorator extends Decorator {
 
-    public BudgetDecorator(EnumTransport transport) {
-        this.transport = transport;
-        this.priority = EnumPreference.BUDGET;
+    public BudgetDecorator(TransportStrategy strategy) {
+        super(strategy);
+        super.priority = EnumPreference.BUDGET;
     }
 
     @Override
@@ -26,7 +25,7 @@ public class BudgetDecorator extends BaseDecorator {
     }
 
     @Override
-    public List<Route> calculateMostOptimalPathToEachVertex(Vertex source, List<Vertex> map) {
+    public Vertex calculateMostOptimalPathToEachVertex(Vertex source) {
         source.setWeight(0);
 
         Set<Vertex> settledNodes = new HashSet<>();
@@ -49,14 +48,14 @@ public class BudgetDecorator extends BaseDecorator {
 
                         p.setWeight(p.getDistance() * factorOfTransportChoice * factorOfCost);
 
-                        evaluatePathWeight(v, current);
+                        TransportStrategy.evaluatePathWeight(v, current);
                         unsettledNodes.add(v);
                     });
 
             settledNodes.add(current);
         }
 
-        return returnOptimalRoutesOnTheMap(source, map);
+        return source;
     }
 
     

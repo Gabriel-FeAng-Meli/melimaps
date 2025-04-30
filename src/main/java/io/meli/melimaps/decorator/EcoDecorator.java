@@ -1,22 +1,21 @@
 package io.meli.melimaps.decorator;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
 import io.meli.melimaps.enums.EnumPreference;
-import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.GraphStructure;
+import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Path;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
-public class EcoDecorator extends BaseDecorator {
+public class EcoDecorator extends Decorator {
 
-    public EcoDecorator(EnumTransport transport) {
-        this.transport = transport;
+    public EcoDecorator(TransportStrategy strategy) {
+        super(strategy);
         this.priority = EnumPreference.ECO;
     }
 
@@ -26,9 +25,8 @@ public class EcoDecorator extends BaseDecorator {
     }
 
     @Override
-    public List<Route> calculateMostOptimalPathToEachVertex(Vertex source, List<Vertex> map) {
+    public Vertex calculateMostOptimalPathToEachVertex(Vertex source) {
         source.setWeight(0);
-
         Set<Vertex> settledNodes = new HashSet<>();
         Queue<Vertex> unsettledNodes = new PriorityQueue<>(Set.of(source));
 
@@ -43,14 +41,14 @@ public class EcoDecorator extends BaseDecorator {
 
                         p.setWeight(p.getDistance() * factorOfTransportChoice * transport.polutionScore());
 
-                        evaluatePathWeight(v, current);
+                        TransportStrategy.evaluatePathWeight(v, current);
                         unsettledNodes.add(v);
                     });
 
             settledNodes.add(current);
         }
 
-        return returnOptimalRoutesOnTheMap(source, map);
+        return source;
     }
 
     

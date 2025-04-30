@@ -5,48 +5,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import io.meli.melimaps.enums.EnumPreference;
 import io.meli.melimaps.enums.EnumTransport;
-import io.meli.melimaps.interfaces.GraphStructure;
 import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
-public abstract class BaseDecorator implements TransportStrategy {
+public abstract class Decorator implements TransportStrategy { // Bridge e Decorator
 
-    protected EnumTransport transport;
+    protected TransportStrategy strategy;
     protected EnumPreference priority;
+    protected EnumTransport transport;
 
+    protected Decorator(TransportStrategy strategy) {
+        this.strategy = strategy;
+        this.transport = strategy.getStrategyType();
+    }
+    
     @Override
     public EnumTransport getStrategyType() {
-        return this.transport;
+        return this.strategy.getStrategyType();
     };
-
-    public static List<Route> calculateRoutesForEachPreference(EnumTransport transport, List<EnumPreference> preferences, Vertex origin, Vertex destination, GraphStructure map) {
-
-        List<Route> routes = new ArrayList<>();
-
-        preferences.forEach(preference -> {
-            BaseDecorator decorator = preference.chooseDecorator(transport);
-
-            if (decorator != null) {
-                
-                routes.add(decorator.calculateBestRoute(origin, destination, map));
-            }
-        });
-
-        return routes;
-
-    }
-
+    
     protected Route getOptimalPathBetween(Vertex source, Vertex destination, List<Vertex> map) {
-        List<Route> routesBetweenVertices = calculateMostOptimalPathToEachVertex(source, map);
-        routesBetweenVertices = routesBetweenVertices.stream()
+        Vertex weightedSource = calculateMostOptimalPathToEachVertex(source);
+        List<Route> routesFromVertex = returnOptimalRoutesOnTheMap(weightedSource, map);
+        routesFromVertex = routesFromVertex.stream()
             .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName()) && route.getOriginName().equalsIgnoreCase(source.getName())).toList();
         
-        Route bestRoute = routesBetweenVertices.get(0);
+        Route bestRoute = routesFromVertex.get(0);
 
         return bestRoute;
     }
@@ -76,13 +64,13 @@ public abstract class BaseDecorator implements TransportStrategy {
 
                     String pathing = ": (%s) from %s to %s for %s kilometers :".formatted(transportUsedOnPath, path.getOrigin().getName(), path.getDestination().getName(), path.getDistance());
 
-                    cost += transport.costPerKmInCents() * path.getDistance();
-                    cost += transport.costPerStopInCents();
+                    cost += transportUsedOnPath.costPerKmInCents() * path.getDistance();
+                    cost += transportUsedOnPath.costPerStopInCents();
 
                     kilometers += path.getDistance();
 
-                    minutes += transport.minutesStoppedAtEachPoint();
-                    minutes += 60 * path.getDistance() / transport.transportSpeedInKmPerHour();
+                    minutes += transportUsedOnPath.minutesStoppedAtEachPoint();
+                    minutes += 60 * path.getDistance() / transportUsedOnPath.transportSpeedInKmPerHour();
 
                     return pathing;
                 }).collect(Collectors.joining(" -> "));
@@ -102,15 +90,6 @@ public abstract class BaseDecorator implements TransportStrategy {
         return paths;
     }
 
-    protected void evaluatePathWeight(Vertex childVertex, Vertex parentVertex) {
-        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathToChild(childVertex).getWeight();
-        if (newWeight < childVertex.getWeight()) {
-            childVertex.setWeight(newWeight);
-            childVertex.setPathsInReachOrder(Stream
-                    .concat(parentVertex.getPathsInReachOrder().stream(), Stream.of(parentVertex.getPathToChild(childVertex))).toList());
-        }
-    }
-
-    protected abstract List<Route> calculateMostOptimalPathToEachVertex(Vertex v, List<Vertex> map);
+    public abstract Vertex calculateMostOptimalPathToEachVertex(Vertex v);
 
 }

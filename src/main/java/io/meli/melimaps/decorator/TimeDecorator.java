@@ -1,22 +1,21 @@
 package io.meli.melimaps.decorator;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
 import io.meli.melimaps.enums.EnumPreference;
-import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.GraphStructure;
+import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Path;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
-public class TimeDecorator extends BaseDecorator {
+public class TimeDecorator extends Decorator {
 
-    public TimeDecorator(EnumTransport transport) {
-        this.transport = transport;
+    public TimeDecorator(TransportStrategy strategy) {
+        super(strategy);
         this.priority = EnumPreference.TIME;
     }
 
@@ -26,7 +25,7 @@ public class TimeDecorator extends BaseDecorator {
     }
 
     @Override
-    public List<Route> calculateMostOptimalPathToEachVertex(Vertex source, List<Vertex> map) {
+    public Vertex calculateMostOptimalPathToEachVertex(Vertex source) {
         source.setWeight(0);
 
         Set<Vertex> settledNodes = new HashSet<>();
@@ -45,14 +44,14 @@ public class TimeDecorator extends BaseDecorator {
 
                         p.setWeight(p.getDistance() * factorOfTransportChoice * factorOfTime);
 
-                        evaluatePathWeight(v, current);
+                        TransportStrategy.evaluatePathWeight(v, current);
                         unsettledNodes.add(v);
                     });
 
             settledNodes.add(current);
         }
 
-        return returnOptimalRoutesOnTheMap(source, map);
+        return source;
     }
 
     

@@ -1,10 +1,10 @@
 package io.meli.melimaps.enums;
 
 import io.meli.melimaps.decorator.AccessibilityDecorator;
-import io.meli.melimaps.decorator.BaseDecorator;
 import io.meli.melimaps.decorator.BudgetDecorator;
 import io.meli.melimaps.decorator.EcoDecorator;
 import io.meli.melimaps.decorator.TimeDecorator;
+import io.meli.melimaps.interfaces.TransportStrategy;
 
 public enum EnumPreference {
     DISTANCE,
@@ -13,14 +13,14 @@ public enum EnumPreference {
     TIME,
     ACCESSIBILITY;
 
-    public BaseDecorator chooseDecorator(EnumTransport t) {
+    public TransportStrategy chooseDecorator(TransportStrategy strategy) {
 
         return switch (this) {
-            case ECO -> new EcoDecorator(t);
-            case ACCESSIBILITY -> new AccessibilityDecorator(t);
-            case BUDGET -> new BudgetDecorator(t);
-            case TIME -> new TimeDecorator(t);
-            default -> null;
+            case ECO -> new EcoDecorator(strategy);
+            case ACCESSIBILITY -> new AccessibilityDecorator(strategy);
+            case BUDGET -> new BudgetDecorator(strategy);
+            case TIME -> new TimeDecorator(strategy);
+            default -> strategy;
         };
     }
 

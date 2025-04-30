@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import io.meli.melimaps.decorator.BaseDecorator;
 import io.meli.melimaps.enums.EnumPreference;
 import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.factories.TransportStrategyFactory;
@@ -17,6 +16,7 @@ import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Graph;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.User;
+import io.meli.melimaps.model.UserPreferences;
 import io.meli.melimaps.model.Vertex;
 import io.meli.melimaps.repository.RouteRepository;
 import io.swagger.v3.core.util.Json;
@@ -42,12 +42,13 @@ public class RouteService {
 
         
         User user = userService.getUserById(userId);
+        UserPreferences transportPreferences = new UserPreferences(user.getTransport(), user.getEcologic(), user.getHurry(), user.getAccessibility(), user.getBudget());
 
         if (user.getTransport().isEmpty()) {
             user.setTransport("ANY");
         }
 
-        TransportStrategy strategy = transportStrategyFactory.instantiateRightStrategy(EnumTransport.valueOf(user.getTransport()), preferenceList);
+        TransportStrategy strategy = transportStrategyFactory.instantiateRightStrategy(EnumTransport.valueOf(user.getTransport()), transportPreferences);
 
         transport = strategy.getStrategyType();
         origin = graph.findPlaceByName(originName);
@@ -57,33 +58,26 @@ public class RouteService {
 
         Map<String, Route> recommendedRoutes = new HashMap<>();
 
-        if (!preferenceList.isEmpty()) {
-            
-            List<Route> decoratedRoutes = BaseDecorator.calculateRoutesForEachPreference(transport, preferenceList, origin, destination, graph);
-            decoratedRoutes.forEach(route -> {
+        preferenceList.forEach((preference) -> {
+            getOrCalculateAndSaveBestRoute(strategy, originName, destinationName, preference);
 
-                recommendedRoutes.put("Best route considering %s".formatted(route.getPrioritize()), route);
-            });
-            
-        }
-        
-        Route bestRoute = getOrCalculateAndSaveBestRoute(strategy, originName, destinationName, originName);
-        
-        recommendedRoutes.put("Best route considering DISTANCE: ", bestRoute);
+        });
+
         
         
         String result = Json.mapper().writeValueAsString(recommendedRoutes);
-
+        
         return result;
     }
-
-    private Route getOrCalculateAndSaveBestRoute(TransportStrategy strategy, String originName, String destinationName, String prioritize) {
+    
+    private Route getOrCalculateAndSaveBestRoute(TransportStrategy strategy, String originName, String destinationName, EnumPreference prioritize) {
 
         Route bestRoute;
-        if (routeRepository.existsByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(prioritize, transport.name(), originName, destinationName)) {
-            bestRoute = routeRepository.findByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(prioritize, transport.name(), originName, destinationName);
+
+        if (routeRepository.existsByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(prioritize.name(), transport.name(), originName, destinationName)) {
+            bestRoute = routeRepository.findByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(prioritize.name(), transport.name(), originName, destinationName);
         } else {
-            bestRoute = strategy.calculateBestRoute(origin, destination, graph);
+            bestRoute = prioritize.chooseDecorator(strategy).calculateBestRoute(origin, destination, graph);
             routeRepository.save(bestRoute);
         }
         return bestRoute;
