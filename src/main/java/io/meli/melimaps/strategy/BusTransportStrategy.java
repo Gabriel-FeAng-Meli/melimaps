@@ -13,7 +13,6 @@ public class BusTransportStrategy extends AbstractTransportStrategy {
 
     @Override
     public Route calculateBestRoute(Vertex origin, Vertex destination, Graph map) {
-        super.destination = destination;
 
         var result = getShortestPathBetween(origin, destination, map.getVertices());
 

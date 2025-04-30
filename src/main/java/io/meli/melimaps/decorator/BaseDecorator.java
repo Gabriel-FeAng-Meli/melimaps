@@ -19,7 +19,7 @@ import io.meli.melimaps.model.Path;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
-public abstract class BaseDecorator implements TransportStrategy {
+public abstract class BaseDecorator implements TransportStrategy { // Bridge e Decorator
 
     protected EnumTransport transport;
     protected EnumDecoration priority;

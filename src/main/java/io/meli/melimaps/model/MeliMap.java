@@ -3,7 +3,6 @@ package io.meli.melimaps.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.meli.melimaps.enums.EnumTransport;
@@ -23,31 +22,20 @@ public class MeliMap implements Graph {
     }    
 
     @Override
-    public void addVertices(final Vertex... v) {
+    public void addVertices(Vertex... v) {
         this.vertices.addAll(Arrays.asList(v));
     }
 
     @Override
-    public void addVertices(final List<Vertex> vertices) {
+    public void addVertices(List<Vertex> vertices) {
         this.vertices.addAll(vertices);
     }
 
     @Override
-    public void getGraphWithVerticesAvailableForTransport(final EnumTransport transport) {
-
-        final List<Vertex> weightedMap = vertices.stream().map((v) -> {
-            v.setPaths(v.getPathToChildren().entrySet().stream().filter(entry -> entry.getValue().getTransports().contains(transport)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-            return v;
-        }).collect(Collectors.toList());
-
-        this.vertices = weightedMap;
-    }
-
-    @Override
-    public Vertex findPlaceByName(final String name) {
+    public Vertex findPlaceByName(String name) {
     
-        final List<Vertex> graph = this.getVertices();
-        final Vertex vertex = graph.stream().filter(v -> v.getName().equalsIgnoreCase(name)).collect(Collectors.toList()).get(0);
+        List<Vertex> graph = this.getVertices();
+        Vertex vertex = graph.stream().filter(v -> v.getName().equalsIgnoreCase(name)).collect(Collectors.toList()).get(0);
 
         return vertex;
     }
@@ -58,15 +46,15 @@ public class MeliMap implements Graph {
 
     public MeliMap build() {
 
-        final MeliMap map = new MeliMap();
+        MeliMap map = new MeliMap();
 
-        final Vertex a = new Vertex("A");
-        final Vertex b = new Vertex("B");
-        final Vertex c = new Vertex("C");
-        final Vertex d = new Vertex("D");
-        final Vertex e = new Vertex("E");
-        final Vertex f = new Vertex("F");
-        final Vertex g = new Vertex("G");
+        Vertex a = new Vertex("A");
+        Vertex b = new Vertex("B");
+        Vertex c = new Vertex("C");
+        Vertex d = new Vertex("D");
+        Vertex e = new Vertex("E");
+        Vertex f = new Vertex("F");
+        Vertex g = new Vertex("G");
 
         a.addChildVertex(b, 2, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         a.addChildVertex(f, 25, EnumTransport.RAILWAY, EnumTransport.BUS);

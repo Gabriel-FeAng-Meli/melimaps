@@ -13,18 +13,21 @@ public class Vertex implements Comparable<Vertex>{
     private final String name;
     private Integer weight;
     private List<Path> pathsInReachOrder;
+    private Map<Vertex, Integer> childrenVertices;
     private Map<Vertex, Path> pathToChildren;
 
     public Vertex(String name) {
         this.name = name;
-        this.weight = Integer.MAX_VALUE;
+        this.weight = 1000;
         this.pathsInReachOrder = new LinkedList<>();
+        this.childrenVertices = new HashMap<>();
         this.pathToChildren = new HashMap<>();
     }
 
     public void addChildVertex(Vertex vertex, int distance, EnumTransport... transports) {
 
         Path path = new Path(this, distance, vertex, transports);
+        childrenVertices.put(vertex, distance);
         pathToChildren.put(vertex, path);
     }
 
@@ -73,6 +76,14 @@ public class Vertex implements Comparable<Vertex>{
 
     public void setPathsInReachOrder(List<Path> pathsInReachOrder) {
         this.pathsInReachOrder = pathsInReachOrder;
+    }
+
+    public Map<Vertex, Integer> getChildrenVertices() {
+        return childrenVertices;
+    }
+
+    public void setChildrenVertices(Map<Vertex, Integer> childrenVertices) {
+        this.childrenVertices = childrenVertices;
     }
 
 }

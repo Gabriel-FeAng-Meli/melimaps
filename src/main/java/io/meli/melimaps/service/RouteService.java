@@ -53,8 +53,6 @@ public class RouteService {
         origin = graph.findPlaceByName(originName);
         destination = graph.findPlaceByName(destinationName);
 
-        graph.getGraphWithVerticesAvailableForTransport(transport);
-
         Map<String, Route> recommendedRoutes = new HashMap<>();
 
         if (!decorationList.isEmpty()) {

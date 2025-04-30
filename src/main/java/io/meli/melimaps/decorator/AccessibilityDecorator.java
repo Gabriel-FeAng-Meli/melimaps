@@ -23,7 +23,6 @@ public class AccessibilityDecorator extends BaseDecorator {
 
     @Override
     public Route calculateBestRoute(Vertex origin, Vertex destination, Graph map) {
-        map.getGraphWithVerticesAvailableForTransport(transport);
         return getOptimalPathBetween(origin, destination, map.getVertices());
     }
     

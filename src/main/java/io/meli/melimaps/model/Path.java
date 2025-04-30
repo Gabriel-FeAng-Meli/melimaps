@@ -20,7 +20,7 @@ public class Path implements Comparable<Path>{
         this.origin = origin;
         this.destination = destination;
         this.distance = distance;
-        this.weight = Integer.MAX_VALUE;
+        this.weight = 1000;
     }
 
     public List<EnumTransport> getTransports() {

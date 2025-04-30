@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public enum EnumTransport {
+public enum EnumTransport { // Flyweight
     ANY,
     CAR,
     BUS,

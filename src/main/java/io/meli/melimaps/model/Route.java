@@ -10,7 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Route {
+public class Route { // Builder
 
     public void setTransport(String transport) {
         this.transport = transport;
