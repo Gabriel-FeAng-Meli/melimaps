@@ -110,7 +110,14 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
             estimatedCost = calculateTotalCost(cents);
             estimatedTime = calculateTimeToTravel(minutes);
 
-            Route routeToNode = null;
+            Route routeToNode = new Route.Builder()
+                .destinationName(node.getName())
+                .originName(source.getName())
+                .distance(estimatedTime)
+                .totalCost(estimatedCost)
+                .timeToReach(estimatedTime)
+                .path(pathString).transport(type.name())
+                .build();
 
             paths.add(routeToNode);
         });
