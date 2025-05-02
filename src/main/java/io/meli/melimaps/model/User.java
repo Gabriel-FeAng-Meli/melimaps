@@ -1,16 +1,13 @@
 package io.meli.melimaps.model;
 
-import java.util.Map;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name="user")
 public class User {
 
     @Id
@@ -29,13 +26,10 @@ public class User {
     
     private Boolean budget = false;
 
-    @ManyToMany
-    @JoinTable(name = "route", joinColumns = @JoinColumn(name="route_id"), inverseJoinColumns = @JoinColumn(name="user_id"))
-    private Map<Route, Integer> favoriteRoutes;
-
-    public User(String name, String transport, Boolean accessibility, Boolean ecologic, Boolean budget) {
+    public User(String name, String transport,Boolean hurry, Boolean accessibility, Boolean ecologic, Boolean budget) {
         this.name = name;
         this.transport = transport;
+        this.hurry = hurry;
         this.accessibility = accessibility;
         this.ecologic = ecologic;
         this.budget = budget;
@@ -101,11 +95,4 @@ public class User {
         this.hurry = hurry;
     }
 
-    public Map<Route, Integer> getFavoriteRoutes() {
-        return favoriteRoutes;
-    }
-
-    public void setFavoriteRoutes(Map<Route, Integer> favoriteRoutes) {
-        this.favoriteRoutes = favoriteRoutes;
-    }
 }
