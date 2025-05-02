@@ -1,5 +1,7 @@
 package io.meli.melimaps.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.meli.melimaps.enums.EnumTransport;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +15,7 @@ public class Route {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Integer id;
 
     private String transport;

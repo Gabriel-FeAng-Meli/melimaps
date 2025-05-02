@@ -33,6 +33,9 @@ public abstract class Decorator implements TransportStrategy { // Bridge e Decor
         List<Route> routesFromVertex = returnOptimalRoutesOnTheMap(weightedSource, map);
         routesFromVertex = routesFromVertex.stream()
             .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName()) && route.getOriginName().equalsIgnoreCase(source.getName())).toList();
+        if (routesFromVertex.size() != 1) {
+            System.out.println("MAIS D UM");
+        }
         
         Route bestRoute = routesFromVertex.get(0);
 
@@ -42,7 +45,7 @@ public abstract class Decorator implements TransportStrategy { // Bridge e Decor
 
     protected Map<String, Route> applyPreferenceToRoute(Route route, EnumPreference preference) {
         Map<String, Route> result = new HashMap<>();
-        result.put("Best route considering %s : ".formatted(preference.name()), route);
+        result.put("Best route considering %s: ".formatted(preference.name()), route);
         return result;
     }
 
@@ -75,7 +78,7 @@ public abstract class Decorator implements TransportStrategy { // Bridge e Decor
                     return pathing;
                 }).collect(Collectors.joining(" -> "));
 
-        String totalCost = "%s cents".formatted(cost);
+        String totalCost = "R$%.02f".formatted(cost.doubleValue()/100);
         String totalTime = "%s minutes".formatted(minutes);
         String totalDistance = "%s kilometers".formatted(kilometers);
 

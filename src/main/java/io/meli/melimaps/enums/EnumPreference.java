@@ -7,7 +7,7 @@ import io.meli.melimaps.decorator.TimeDecorator;
 import io.meli.melimaps.interfaces.TransportStrategy;
 
 public enum EnumPreference {
-    DISTANCE,
+    TRANSPORT,
     ECO,
     BUDGET,
     TIME,

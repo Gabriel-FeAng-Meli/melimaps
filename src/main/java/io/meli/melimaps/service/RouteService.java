@@ -32,14 +32,13 @@ public class RouteService {
     @Autowired
     private UserService userService;
 
-    private EnumTransport transport;
-    private Vertex origin;
-    private Vertex destination;
-
-    Graph graph = new Graph().build();
-
+    
     public String generateOptimalRouteForUser(Integer userId, String originName, String destinationName, List<EnumPreference> preferenceList) throws JsonProcessingException {
-
+        
+        EnumTransport transport;
+        Vertex origin;
+        Vertex destination;
+        Graph graph = new Graph().build();
         
         User user = userService.getUserById(userId);
         UserPreferences transportPreferences = new UserPreferences(user.getTransport(), user.getEcologic(), user.getHurry(), user.getAccessibility(), user.getBudget());
@@ -59,8 +58,7 @@ public class RouteService {
         Map<String, Route> recommendedRoutes = new HashMap<>();
 
         preferenceList.forEach((preference) -> {
-            getOrCalculateAndSaveBestRoute(strategy, originName, destinationName, preference);
-
+            recommendedRoutes.put("Best route considering %s".formatted(preference.name()), preference.chooseDecorator(strategy).calculateBestRoute(origin, destination, graph));
         });
 
         
@@ -70,19 +68,5 @@ public class RouteService {
         return result;
     }
     
-    private Route getOrCalculateAndSaveBestRoute(TransportStrategy strategy, String originName, String destinationName, EnumPreference prioritize) {
-
-        Route bestRoute;
-
-        if (routeRepository.existsByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(prioritize.name(), transport.name(), originName, destinationName)) {
-            bestRoute = routeRepository.findByPrioritizeAndTransportAndOriginNameAndDestinationNameAllIgnoringCase(prioritize.name(), transport.name(), originName, destinationName);
-        } else {
-            bestRoute = prioritize.chooseDecorator(strategy).calculateBestRoute(origin, destination, graph);
-            routeRepository.save(bestRoute);
-        }
-        return bestRoute;
-        
-    }
-
     
 }

@@ -82,8 +82,8 @@ public class Graph implements GraphStructure {
         Vertex g = new Vertex("G");
 
         a.addChildVertex(b, 2, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
-        a.addChildVertex(f, 25, EnumTransport.RAILWAY, EnumTransport.BUS);
         a.addChildVertex(c, 9, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
+        a.addChildVertex(f, 25, EnumTransport.RAILWAY, EnumTransport.BUS);
         b.addChildVertex(c, 5, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         b.addChildVertex(d, 3, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         b.addChildVertex(e, 2, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);

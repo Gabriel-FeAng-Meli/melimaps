@@ -6,6 +6,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import io.meli.melimaps.enums.EnumPreference;
+import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.GraphStructure;
 import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Path;
@@ -37,9 +38,22 @@ public class EcoDecorator extends Decorator {
                         Vertex v = entry.getKey();
                         Path p = entry.getValue();
 
+                        EnumTransport transportForPath;
+                        Integer pathUnavailableForCarFactor = 0;
+
+                        if (p.getTransports().contains(transport)) {
+                            transportForPath = transport;
+                        } else if(!p.getTransports().contains(transport) && transport.equals(EnumTransport.CAR)) {
+                            transportForPath = EnumTransport.CAR;
+                            pathUnavailableForCarFactor = 10000;
+                        }
+                        else {
+                            transportForPath = EnumTransport.FOOT;
+                        }
+
                         Integer factorOfTransportChoice = transport.factorTransportPreference(p.getTransports());
 
-                        p.setWeight(p.getDistance() * factorOfTransportChoice * transport.polutionScore());
+                        p.setWeight(p.getDistance() * factorOfTransportChoice * transportForPath.polutionScore() + pathUnavailableForCarFactor);
 
                         TransportStrategy.evaluatePathWeight(v, current);
                         unsettledNodes.add(v);

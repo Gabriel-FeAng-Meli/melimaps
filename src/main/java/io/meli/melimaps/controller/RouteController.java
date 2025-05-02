@@ -26,7 +26,7 @@ public class RouteController {
     private RouteService routeService;
 
     @PostMapping
-    public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req, @RequestParam(required=false, defaultValue="DISTANCE") EnumPreference... preferences) throws JsonProcessingException {
+    public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req, @RequestParam(required=false, defaultValue="TRANSPORT") EnumPreference... preferences) throws JsonProcessingException {
         
 
         List<EnumPreference> preferenceList = Arrays.asList(preferences);
