@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.meli.melimaps.model.RequestCreateUser;
 import io.meli.melimaps.model.User;
 import io.meli.melimaps.service.UserService;
 
@@ -36,7 +37,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@RequestBody RequestCreateUser req) {
+        User user = new User(req.name(), req.transport(), req.hurry(), req.accessibility(), req.ecologic(), req.budget());
 
         userService.createUser(user);
         

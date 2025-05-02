@@ -30,10 +30,10 @@ public class TransportStrategyFactory {
 
     private EnumTransport chooseBestTransport(UserPreferences transportPreferences) {
 
-        if (!transportPreferences.preferLowCostTransport()) return EnumTransport.CAR; 
-        if (!transportPreferences.preferLowCO2EmissionTransport()) return EnumTransport.BUS;
-        if (!transportPreferences.preferAccessibleTransport()) {
-            return transportPreferences.preferFasterTransport() ?
+        if (!transportPreferences.preferLowCostTransport) return EnumTransport.CAR; 
+        if (!transportPreferences.preferLowCO2EmissionTransport) return EnumTransport.BUS;
+        if (!transportPreferences.preferAccessibleTransport) {
+            return transportPreferences.preferFasterTransport ?
                 EnumTransport.BIKE : EnumTransport.FOOT;
         }
         return EnumTransport.RAILWAY;
