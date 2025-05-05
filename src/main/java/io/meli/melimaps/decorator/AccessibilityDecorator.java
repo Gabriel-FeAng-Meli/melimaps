@@ -39,9 +39,9 @@ public class AccessibilityDecorator extends Decorator {
                         Vertex v = entry.getKey();
                         Path p = entry.getValue();
 
-                        p.setWeight(p.getDistance() * transport.badAccessibilityScore());
+                        Integer factor = (transport.badAccessibilityScore()) + 10;
 
-                        TransportStrategy.evaluatePathWeight(v, current);
+                        TransportStrategy.evaluatePathWeight(v, current, factor);
                         unsettledNodes.add(v);
                     });
 

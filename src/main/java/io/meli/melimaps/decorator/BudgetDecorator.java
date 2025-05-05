@@ -40,15 +40,10 @@ public class BudgetDecorator extends Decorator {
 
                         Integer factorOfTransportChoice = transport.factorTransportPreference(p.getTransports());
                         Integer factorOfCost = transport.costPerKmInCents() * p.getDistance() + transport.costPerStopInCents();
-                        factorOfCost /= 10;
 
-                        if (factorOfCost == 0) {
-                            factorOfCost = 1;
-                        }
+                        Integer factor = (p.getDistance() * factorOfTransportChoice * factorOfCost);
 
-                        p.setWeight(p.getDistance() * factorOfTransportChoice * factorOfCost);
-
-                        TransportStrategy.evaluatePathWeight(v, current);
+                        TransportStrategy.evaluatePathWeight(v, current, factor);
                         unsettledNodes.add(v);
                     });
 

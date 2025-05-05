@@ -18,11 +18,12 @@ public class Route {
     @JsonIgnore
     private Integer id;
 
+    @JsonIgnore
     private String transport;
     private String originName;
     private String destinationName;
     private String distance;
-    private String prioritize = "DISTANCE";
+    private String prioritize = "TRANSPORT";
     private String timeToReach;
     private String totalCost;
     private String path;

@@ -83,7 +83,7 @@ public class Graph implements GraphStructure {
 
         a.addChildVertex(b, 2, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         a.addChildVertex(c, 9, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
-        a.addChildVertex(f, 25, EnumTransport.RAILWAY, EnumTransport.BUS);
+        a.addChildVertex(f, 35, EnumTransport.RAILWAY, EnumTransport.BUS);
         b.addChildVertex(c, 5, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         b.addChildVertex(d, 3, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         b.addChildVertex(e, 2, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
@@ -92,7 +92,7 @@ public class Graph implements GraphStructure {
         d.addChildVertex(f, 22, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         e.addChildVertex(f, 5, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         
-        a.addChildVertex(g, 15, EnumTransport.RAILWAY, EnumTransport.BUS);
+        a.addChildVertex(g, 10, EnumTransport.RAILWAY, EnumTransport.BUS);
         g.addChildVertex(f, 5, EnumTransport.RAILWAY, EnumTransport.BUS);
 
 

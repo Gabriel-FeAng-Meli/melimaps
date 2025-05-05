@@ -14,7 +14,7 @@ public enum EnumTransport {
 
     public Integer factorTransportPreference(List<EnumTransport> transportationMethodsAvailableOnPath) {
         if (!transportationMethodsAvailableOnPath.contains(this)) {
-            return 2;
+            return 3;
         }
         return 1;
     }
@@ -47,10 +47,9 @@ public enum EnumTransport {
 
     public Integer costPerStopInCents() {
         return switch (this) {
-            case ANY -> null;
             case BUS -> 580;
             case RAILWAY -> 260;
-            case FOOT, BIKE, CAR -> 00;
+            default -> 0;
         };
     }
 
@@ -63,10 +62,9 @@ public enum EnumTransport {
 
     public Integer minutesStoppedAtEachPoint() {
         return switch(this) {
-            case ANY -> null;
-            case CAR, FOOT, BIKE -> 0;
-            case BUS -> 55;
-            case RAILWAY -> 50;
+            case BUS -> 25;
+            case RAILWAY -> 5;
+            default -> 0;
         };
     }
 
@@ -74,7 +72,7 @@ public enum EnumTransport {
         return switch (this) {
             case ANY -> null;
             case CAR -> 80;
-            case BUS -> 80;
+            case BUS -> 40;
             case RAILWAY -> 120;
             case FOOT -> 4;
             case BIKE -> 18;
@@ -83,23 +81,16 @@ public enum EnumTransport {
 
     public Integer badAccessibilityScore() {
         return switch (this) {
-            case ANY -> null;
-            case CAR -> 1;
-            case BIKE -> 100;
-            case BUS -> 1;
-            case FOOT -> 100;
-            case RAILWAY -> 1;
+            case BIKE, FOOT -> 10;
+            default -> 1;
         };
     }
 
     public Integer polutionScore() {
         return switch (this) {
-            case ANY -> null;
             case CAR -> 10;
-            case BUS -> 3;
-            case RAILWAY -> 2;
-            case FOOT -> 1;
-            case BIKE -> 1;
+            case BUS, RAILWAY -> 2;
+            default -> 1;
         };
     }
 

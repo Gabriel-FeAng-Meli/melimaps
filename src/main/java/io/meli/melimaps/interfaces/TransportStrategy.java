@@ -12,8 +12,8 @@ public interface TransportStrategy {
 
     EnumTransport getStrategyType();
 
-    static void evaluatePathWeight(Vertex childVertex, Vertex parentVertex) {
-        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathToChild(childVertex).getWeight();
+    static void evaluatePathWeight(Vertex childVertex, Vertex parentVertex, Integer preferenceFactor) {
+        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathToChild(childVertex).getWeight() + preferenceFactor;
         if (newWeight < childVertex.getWeight()) {
             childVertex.setWeight(newWeight);
             childVertex.setPathsInReachOrder(Stream

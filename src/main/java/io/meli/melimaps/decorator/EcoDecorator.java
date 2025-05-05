@@ -39,13 +39,9 @@ public class EcoDecorator extends Decorator {
                         Path p = entry.getValue();
 
                         EnumTransport transportForPath;
-                        Integer pathUnavailableForCarFactor = 0;
 
                         if (p.getTransports().contains(transport)) {
                             transportForPath = transport;
-                        } else if(!p.getTransports().contains(transport) && transport.equals(EnumTransport.CAR)) {
-                            transportForPath = EnumTransport.CAR;
-                            pathUnavailableForCarFactor = 10000;
                         }
                         else {
                             transportForPath = EnumTransport.FOOT;
@@ -53,9 +49,9 @@ public class EcoDecorator extends Decorator {
 
                         Integer factorOfTransportChoice = transport.factorTransportPreference(p.getTransports());
 
-                        p.setWeight(p.getDistance() * factorOfTransportChoice * transportForPath.polutionScore() + pathUnavailableForCarFactor);
+                        Integer factor = (p.getDistance() * factorOfTransportChoice * transportForPath.polutionScore());
 
-                        TransportStrategy.evaluatePathWeight(v, current);
+                        TransportStrategy.evaluatePathWeight(v, current, factor);
                         unsettledNodes.add(v);
                     });
 

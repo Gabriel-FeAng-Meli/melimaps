@@ -25,6 +25,33 @@ public class TimeDecorator extends Decorator {
         return getOptimalPathBetween(origin, destination, map.getVertices());
     }
 
+    private Vertex removeUnavailableVertices(Vertex source) {
+
+        Set<Path> settledPaths = new HashSet<>();
+        Set<Path> a = new HashSet<>();
+        source.getPathToChildren().forEach((v, p) -> {
+            a.add(p);
+        });
+        Queue<Path> unsettledPaths = new PriorityQueue<>(a);
+  
+        while (!unsettledPaths.isEmpty()) {
+            Path current = unsettledPaths.poll();
+            current.getOrigin().getPathToChildren().entrySet().stream().filter(entry -> !settledPaths.contains(entry.getValue())).forEach(entry -> {
+        
+                Vertex v = entry.getKey();
+                Path p = entry.getValue();
+
+                TransportStrategy.evaluatePathWeight(v, current.getOrigin(), 0);
+                p.setWeight(v.getWeight());
+
+                settledPaths.add(p);
+            });
+
+        }
+        return source;
+
+    }
+
     @Override
     public Vertex calculateMostOptimalPathToEachVertex(Vertex source) {
         source.setWeight(0);
@@ -36,33 +63,23 @@ public class TimeDecorator extends Decorator {
         });
         Queue<Path> unsettledPaths = new PriorityQueue<>(a);
 
+
         while (!unsettledPaths.isEmpty()) {
             Path current = unsettledPaths.poll();
             current.getOrigin().getPathToChildren().entrySet().stream().filter(
-                    entry -> entry.getValue().getTransports().contains(transport) || entry.getValue().getTransports().contains(EnumTransport.FOOT) && !settledPaths.contains(entry.getValue())).forEach(entry -> {
+                    entry -> entry.getValue().getTransports().contains(transport) || entry.getValue().getTransports().contains(EnumTransport.FOOT)).filter(entry -> !settledPaths.contains(entry.getValue())).forEach(entry -> {
                         Vertex v = entry.getKey();
                         Path p = entry.getValue();
-
-                        EnumTransport transportForPath;
-                        Integer pathUnavailableForCarFactor = 0;
+                        EnumTransport t = EnumTransport.FOOT;
 
                         if (p.getTransports().contains(transport)) {
-                            transportForPath = transport;
-                        } else if(!p.getTransports().contains(transport) && transport.equals(EnumTransport.CAR)) {
-                            transportForPath = EnumTransport.CAR;
-                            pathUnavailableForCarFactor = 10000;
-                        }
-                        else {
-                            transportForPath = EnumTransport.FOOT;
+                            t = transport;
                         }
 
-                        Integer factorOfTransportChoice = transport.factorTransportPreference(p.getTransports());
-                        Double factorOfPreferenceSpeed = p.getDistance().doubleValue() / transportForPath.transportSpeedInKmPerHour().doubleValue();
-                        Integer factorOfTime = factorOfPreferenceSpeed.intValue() + transportForPath.minutesStoppedAtEachPoint();
+                        Integer factor = 60 * p.getDistance() / t.transportSpeedInKmPerHour();
+                        factor += t.minutesStoppedAtEachPoint();
 
-                        p.setWeight(p.getDistance() * factorOfTransportChoice * factorOfTime + pathUnavailableForCarFactor);
-
-                        TransportStrategy.evaluatePathWeight(v, current.getOrigin());
+                        TransportStrategy.evaluatePathWeight(v, current.getOrigin(), factor);
                         p.setWeight(v.getWeight());
 
                         settledPaths.add(p);
