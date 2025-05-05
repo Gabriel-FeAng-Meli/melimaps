@@ -32,10 +32,10 @@ public class RouteService {
     @Autowired
     private UserService userService;
 
-    
+    private Route bestRoute;
+
     public String generateOptimalRouteForUser(Integer userId, String originName, String destinationName, List<EnumPreference> preferenceList) throws JsonProcessingException {
         
-        EnumTransport transport;
         Vertex origin;
         Vertex destination;
         Graph graph = new Graph().build();
@@ -46,24 +46,24 @@ public class RouteService {
         if (user.getTransport().isEmpty()) {
             user.setTransport("ANY");
         }
-
+        
+        
         TransportStrategy strategy = transportStrategyFactory.instantiateRightStrategy(EnumTransport.valueOf(user.getTransport()), transportPreferences);
-
-        transport = strategy.getStrategyType();
+        
         origin = graph.findPlaceByName(originName);
         destination = graph.findPlaceByName(destinationName);
-
-        graph.getGraphWithVerticesAvailableForTransport(transport);
-
-        Map<String, Route> recommendedRoutes = new HashMap<>();
-
+        
+        String title = "Best route considering %s".formatted(preferenceList);
+        
         preferenceList.forEach((preference) -> {
-            recommendedRoutes.put("Best route considering %s".formatted(preference.name()), preference.chooseDecorator(strategy).calculateBestRoute(origin, destination, graph));
+            bestRoute = preference.chooseDecorator(strategy).calculateBestRoute(origin, destination, graph);
         });
-
         
-        
+        Map<String, Route> recommendedRoutes = new HashMap<>();
+        recommendedRoutes.put(title, bestRoute);
         String result = Json.mapper().writeValueAsString(recommendedRoutes);
+
+        bestRoute = null;
         
         return result;
     }

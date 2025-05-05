@@ -81,8 +81,9 @@ public enum EnumTransport {
 
     public Integer badAccessibilityScore() {
         return switch (this) {
-            case BIKE, FOOT -> 10;
-            default -> 1;
+            case BIKE, FOOT -> 100;
+            case CAR -> 1;
+            default -> 25;
         };
     }
 

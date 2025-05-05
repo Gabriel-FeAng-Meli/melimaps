@@ -29,13 +29,10 @@ public abstract class Decorator implements TransportStrategy { // Bridge e Decor
     };
     
     protected Route getOptimalPathBetween(Vertex source, Vertex destination, List<Vertex> map) {
-        Vertex weightedSource = calculateMostOptimalPathToEachVertex(source);
+        Vertex weightedSource = calculateMostOptimalPathToEachVertex(source, destination, map, transport);
         List<Route> routesFromVertex = returnOptimalRoutesOnTheMap(weightedSource, map);
         routesFromVertex = routesFromVertex.stream()
             .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName()) && route.getOriginName().equalsIgnoreCase(source.getName())).toList();
-        if (routesFromVertex.size() != 1) {
-            System.out.println("MAIS D UM");
-        }
         
         Route bestRoute = routesFromVertex.get(0);
 
@@ -93,6 +90,6 @@ public abstract class Decorator implements TransportStrategy { // Bridge e Decor
         return paths;
     }
 
-    public abstract Vertex calculateMostOptimalPathToEachVertex(Vertex v);
+    public abstract Vertex calculateMostOptimalPathToEachVertex(Vertex v, Vertex destination, List<Vertex> map, EnumTransport transport);
 
 }

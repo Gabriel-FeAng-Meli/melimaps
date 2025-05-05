@@ -1,15 +1,11 @@
 package io.meli.melimaps.decorator;
 
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
+import java.util.List;
 
 import io.meli.melimaps.enums.EnumPreference;
 import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.GraphStructure;
 import io.meli.melimaps.interfaces.TransportStrategy;
-import io.meli.melimaps.model.Path;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
@@ -25,69 +21,11 @@ public class TimeDecorator extends Decorator {
         return getOptimalPathBetween(origin, destination, map.getVertices());
     }
 
-    private Vertex removeUnavailableVertices(Vertex source) {
-
-        Set<Path> settledPaths = new HashSet<>();
-        Set<Path> a = new HashSet<>();
-        source.getPathToChildren().forEach((v, p) -> {
-            a.add(p);
-        });
-        Queue<Path> unsettledPaths = new PriorityQueue<>(a);
-  
-        while (!unsettledPaths.isEmpty()) {
-            Path current = unsettledPaths.poll();
-            current.getOrigin().getPathToChildren().entrySet().stream().filter(entry -> !settledPaths.contains(entry.getValue())).forEach(entry -> {
-        
-                Vertex v = entry.getKey();
-                Path p = entry.getValue();
-
-                TransportStrategy.evaluatePathWeight(v, current.getOrigin(), 0);
-                p.setWeight(v.getWeight());
-
-                settledPaths.add(p);
-            });
-
-        }
-        return source;
-
-    }
-
     @Override
-    public Vertex calculateMostOptimalPathToEachVertex(Vertex source) {
-        source.setWeight(0);
-
-        Set<Path> settledPaths = new HashSet<>();
-        Set<Path> a = new HashSet<>();
-        source.getPathToChildren().forEach((v, p) -> {
-            a.add(p);
-        });
-        Queue<Path> unsettledPaths = new PriorityQueue<>(a);
-
-
-        while (!unsettledPaths.isEmpty()) {
-            Path current = unsettledPaths.poll();
-            current.getOrigin().getPathToChildren().entrySet().stream().filter(
-                    entry -> entry.getValue().getTransports().contains(transport) || entry.getValue().getTransports().contains(EnumTransport.FOOT)).filter(entry -> !settledPaths.contains(entry.getValue())).forEach(entry -> {
-                        Vertex v = entry.getKey();
-                        Path p = entry.getValue();
-                        EnumTransport t = EnumTransport.FOOT;
-
-                        if (p.getTransports().contains(transport)) {
-                            t = transport;
-                        }
-
-                        Integer factor = 60 * p.getDistance() / t.transportSpeedInKmPerHour();
-                        factor += t.minutesStoppedAtEachPoint();
-
-                        TransportStrategy.evaluatePathWeight(v, current.getOrigin(), factor);
-                        p.setWeight(v.getWeight());
-
-                        settledPaths.add(p);
-                    });
-
-        }
-
-        return source;
+    public Vertex calculateMostOptimalPathToEachVertex(Vertex source, Vertex destination, List<Vertex> map, EnumTransport transport) {
+        Integer byDistanceFactor = 1;
+        Integer byStopFactor = transport.minutesStoppedAtEachPoint();
+        return TransportStrategy.calculateShortestPathToEachVertex(source, source, map, transport, byDistanceFactor, byStopFactor);
     }
 
     

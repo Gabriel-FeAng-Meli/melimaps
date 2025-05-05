@@ -1,14 +1,11 @@
 package io.meli.melimaps.decorator;
 
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
+import java.util.List;
 
 import io.meli.melimaps.enums.EnumPreference;
+import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.GraphStructure;
 import io.meli.melimaps.interfaces.TransportStrategy;
-import io.meli.melimaps.model.Path;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
@@ -25,33 +22,12 @@ public class BudgetDecorator extends Decorator {
     }
 
     @Override
-    public Vertex calculateMostOptimalPathToEachVertex(Vertex source) {
-        source.setWeight(0);
-
-        Set<Vertex> settledNodes = new HashSet<>();
-        Queue<Vertex> unsettledNodes = new PriorityQueue<>(Set.of(source));
-
-        while (!unsettledNodes.isEmpty()) {
-            Vertex current = unsettledNodes.poll();
-            current.getPathToChildren().entrySet().stream().filter(
-                    entry -> !settledNodes.contains(entry.getKey())).forEach(entry -> {
-                        Vertex v = entry.getKey();
-                        Path p = entry.getValue();
-
-                        Integer factorOfTransportChoice = transport.factorTransportPreference(p.getTransports());
-                        Integer factorOfCost = transport.costPerKmInCents() * p.getDistance() + transport.costPerStopInCents();
-
-                        Integer factor = (p.getDistance() * factorOfTransportChoice * factorOfCost);
-
-                        TransportStrategy.evaluatePathWeight(v, current, factor);
-                        unsettledNodes.add(v);
-                    });
-
-            settledNodes.add(current);
-        }
-
-        return source;
+    public Vertex calculateMostOptimalPathToEachVertex(Vertex source, Vertex destination, List<Vertex> map, EnumTransport transport) {
+        Integer byDistanceFactor = transport.costPerKmInCents();
+        Integer byStopFactor = transport.costPerStopInCents();
+        return TransportStrategy.calculateShortestPathToEachVertex(source, source, map, transport, byDistanceFactor, byStopFactor);
     }
+
 
     
 }

@@ -1,22 +1,12 @@
 package io.meli.melimaps.strategy;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import io.meli.melimaps.enums.EnumPreference;
 import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.interfaces.GraphStructure;
 import io.meli.melimaps.interfaces.TransportStrategy;
-import io.meli.melimaps.model.Path;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.Vertex;
 
@@ -35,18 +25,10 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
         this.type = transport;
     }
 
-    protected Map<String, Route> applyPreferenceToRoute(Route route, EnumPreference preference) {
-        Map<String, Route> result = new HashMap<>();
-        result.put("Best route considering %s : ".formatted(preference.name()), route);
-        return result;
-    }
 
     protected Route getShortestPathBetween(Vertex source, Vertex destination, List<Vertex> map) {
-        List<Route> bestRoutes = calculateShortestPathToEachVertex(source, destination, map);
-        List<Route> a = bestRoutes.stream()
-                .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName())
-                        && route.getOriginName().equalsIgnoreCase(source.getName()))
-                .toList();
+        Vertex weightedSource = TransportStrategy.calculateShortestPathToEachVertex(source, destination, map, type, 1,0);
+        List<Route> bestRoutes = returnOptimalRoutesOnTheMap(weightedSource, map);
         Route bestRoute = bestRoutes.stream()
                 .filter(route -> route.getDestinationName().equalsIgnoreCase(destination.getName())
                         && route.getOriginName().equalsIgnoreCase(source.getName()))
@@ -133,93 +115,6 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
         return paths;
     }
 
-    protected void evaluatePathWeight(Vertex childVertex, Vertex parentVertex) {
-        Integer newWeight = parentVertex.getWeight() + parentVertex.getPathToChild(childVertex).getDistance();
-        if (newWeight < childVertex.getWeight()) {
-            childVertex.setWeight(newWeight);
-            childVertex.setPathsInReachOrder(Stream
-                    .concat(parentVertex.getPathsInReachOrder().stream(),
-                            Stream.of(parentVertex.getPathToChild(childVertex)))
-                    .toList());
-        }
-    }
-
-    protected List<Route> calculateShortestPathToEachVertex(Vertex origin, Vertex destination, List<Vertex> map) {
-
-        Vertex source = origin;
-
-        source.setWeight(0);
-
-        Set<Path> settledPaths = new HashSet<>();
-        Set<Vertex> settledNodes = new HashSet<>();
-        Queue<Vertex> unsettledNodes = new PriorityQueue<>(Collections.singleton(source));
-        Queue<Path> unsettledPaths = new PriorityQueue<>(new HashSet<>());
-
-        while (!unsettledNodes.isEmpty()) {
-            Vertex current = unsettledNodes.poll();
-            current.getPathToChildren().forEach((vertex, path) -> {
-                unsettledPaths.add(path);
-            });
-
-            while (!unsettledPaths.isEmpty()) {
-                Path p = unsettledPaths.poll();
-                
-                if (p.getDestination().equals(destination)) {
-                    doThing(p);
-                }
-                if (!settledNodes.contains(p.getDestination()) && p.getTransports().contains(type)){
-                    evaluatePathWeight(p.getDestination(), current);
-                    unsettledNodes.add(p.getDestination());
-                    settledPaths.add(p);
-                }
-
-            }
-
-            settledNodes.add(current);
-        }
-
-        settledPaths.forEach((path) -> {
-            System.out.println(path.getOrigin().getName() + " -> " + path.getDestination().getName() + ":"
-                    + path.getDistance().toString());
-        });
-
-
-        return returnOptimalRoutesOnTheMap(source, map);
-    }
-
-    private void doThing(Path pathing) {
-
-            Vertex node = pathing.getDestination();
-
-            String pathString = node.getPathsInReachOrder().stream().map((path) -> {
-
-                distance = 0;
-                minutes = 0L;
-                cents = 0L;
-                estimatedCost = "";
-                estimatedTime = "";
-
-                EnumTransport transportUsedOnPath = EnumTransport.FOOT;
-                if (path.getTransports().contains(type)) {
-                    transportUsedOnPath = type;
-                }
-
-                cents += transportUsedOnPath.costPerKmInCents() * path.getDistance();
-                cents += transportUsedOnPath.costPerStopInCents();
-
-                distance += path.getDistance();
-
-                minutes += transportUsedOnPath.minutesStoppedAtEachPoint();
-                minutes += 60 * path.getDistance() / transportUsedOnPath.transportSpeedInKmPerHour();
-
-                String pathStringy = ": (%s) from %s to %s for %s kilometers :".formatted(transportUsedOnPath,
-                        path.getOrigin().getName(), path.getDestination().getName(), path.getDistance());
-                return pathStringy;
-            }).collect(Collectors.joining(" -> "));
-        
-            System.out.println(pathString);
-            
-    }
 
 }
 
