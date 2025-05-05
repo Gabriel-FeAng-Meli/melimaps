@@ -100,13 +100,13 @@ public abstract class AbstractTransportStrategy implements TransportStrategy {
 
             Route routeToNode;
             if (distance.equals(0) && pathString.isBlank()) {
-                routeToNode = new Route(type, source.getName(), node.getName(), "?", "?", "?", "Sorry, no available paths meet the conditions to reach the desired destination.");
+                routeToNode = new Route(type.name(), source.getName(), node.getName(), "?", "?", "?", "Sorry, no available paths meet the conditions to reach the desired destination.");
             } else {
     
                 estimatedCost = calculateTotalCost(cents);
                 estimatedTime = calculateTimeToTravel(minutes);
     
-                routeToNode = new Route(type, source.getName(), node.getName(), "%s kilometers".formatted(distance), estimatedTime, estimatedCost, pathString);
+                routeToNode = new Route(type.name(), source.getName(), node.getName(), "%s kilometers".formatted(distance), estimatedTime, estimatedCost, pathString);
 
             }
 

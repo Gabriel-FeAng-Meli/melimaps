@@ -1,7 +1,6 @@
 package io.meli.melimaps.controller;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,10 +27,8 @@ public class RouteController {
     @PostMapping
     public ResponseEntity<?> obtainBestRoute(@RequestBody RequestOptimalRoute req, @RequestParam(required=false, defaultValue="DISTANCE") EnumPreference... preferences) throws JsonProcessingException {
         
-
-        List<EnumPreference> preferenceList = Arrays.asList(preferences);
-        var result = routeService.generateOptimalRouteForUser(req.userId(), req.originName(), req.destinationName(), preferenceList);
-
+        Set<EnumPreference> preferenceSet = Set.of(preferences);
+        var result = routeService.generateOptimalRouteForUser(req.userId(), req.originName(), req.destinationName(), preferenceSet);
 
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }

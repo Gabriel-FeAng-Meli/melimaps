@@ -1,13 +1,18 @@
 package io.meli.melimaps.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.relational.core.mapping.Table;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.ManyToMany;
 
 @Entity
-@Table(name="user")
+@Table
 public class User {
 
     @Id
@@ -25,6 +30,9 @@ public class User {
     private Boolean ecologic = false;
     
     private Boolean budget = false;
+
+    @ManyToMany(mappedBy = "users")
+    private List<Route> routes = new ArrayList<>();
 
     public User(String name, String transport,Boolean hurry, Boolean accessibility, Boolean ecologic, Boolean budget) {
         this.name = name;
@@ -93,6 +101,14 @@ public class User {
 
     public void setHurry(Boolean hurry) {
         this.hurry = hurry;
+    }
+
+    public List<Route> getRoutes() {
+        return routes;
+    }
+
+    public void setRoutes(List<Route> routes) {
+        this.routes = routes;
     }
 
 }

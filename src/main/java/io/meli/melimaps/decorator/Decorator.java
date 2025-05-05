@@ -79,7 +79,7 @@ public abstract class Decorator implements TransportStrategy { // Bridge e Decor
         String totalTime = "%s minutes".formatted(minutes);
         String totalDistance = "%s kilometers".formatted(kilometers);
 
-        Route routeToNode = new Route(0, transport.name(), source.getName(), node.getName(), totalDistance, totalTime, totalCost, pathString, priority.name());
+        Route routeToNode = new Route(transport.name(), source.getName(), node.getName(), totalDistance, totalTime, totalCost, pathString);
 
         paths.add(routeToNode);
 
