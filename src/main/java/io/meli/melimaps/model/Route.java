@@ -38,12 +38,15 @@ public class Route {
     private String path;
 
     @JsonIgnore
+    private boolean available = true;
+    
+    @JsonIgnore
     private String requestProperties;
-
+    
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
-        name = "route_user", joinColumns = @JoinColumn(name = "route_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
+        name = "requisition", joinColumns = @JoinColumn(name = "route_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
     )
     private List<User> users = new ArrayList<>();
 
@@ -162,5 +165,14 @@ public class Route {
     public void setRequestProperties(String requestProperties) {
         this.requestProperties = requestProperties;
     }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean active) {
+        this.available = active;
+    }
+
 
 }

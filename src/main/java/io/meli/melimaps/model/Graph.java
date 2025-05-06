@@ -73,13 +73,13 @@ public class Graph implements GraphStructure {
 
         Graph map = new Graph();
 
-        Vertex a = new Vertex("A");
-        Vertex b = new Vertex("B");
-        Vertex c = new Vertex("C");
-        Vertex d = new Vertex("D");
-        Vertex e = new Vertex("E");
-        Vertex f = new Vertex("F");
-        Vertex g = new Vertex("G");
+        Vertex a = new Vertex.Builder().name("A").build();
+        Vertex b = new Vertex.Builder().name("B").build();
+        Vertex c = new Vertex.Builder().name("C").build();
+        Vertex d = new Vertex.Builder().name("D").build();
+        Vertex e = new Vertex.Builder().name("E").build();
+        Vertex f = new Vertex.Builder().name("F").build();
+        Vertex g = new Vertex.Builder().name("G").build();
 
         a.addChildVertex(b, 2, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);
         a.addChildVertex(c, 9, EnumTransport.FOOT, EnumTransport.BIKE, EnumTransport.CAR, EnumTransport.BUS);

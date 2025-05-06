@@ -14,10 +14,12 @@ import io.meli.melimaps.enums.EnumTransport;
 import io.meli.melimaps.factories.TransportStrategyFactory;
 import io.meli.melimaps.interfaces.TransportStrategy;
 import io.meli.melimaps.model.Graph;
+import io.meli.melimaps.model.Requisition;
 import io.meli.melimaps.model.Route;
 import io.meli.melimaps.model.User;
 import io.meli.melimaps.model.UserPreferences;
 import io.meli.melimaps.model.Vertex;
+import io.meli.melimaps.repository.RequisitionRepository;
 import io.meli.melimaps.repository.RouteRepository;
 import io.swagger.v3.core.util.Json;
 
@@ -28,6 +30,9 @@ public class RouteService {
 
     @Autowired
     private RouteRepository routeRepository;
+
+    @Autowired
+    private RequisitionRepository requisitionRepository;
 
     @Autowired
     private UserService userService;
@@ -54,6 +59,10 @@ public class RouteService {
 
         if (routeRepository.existsByRequestProperties(requestProperties)) {
             bestRoute = routeRepository.findByRequestProperties(requestProperties).get(0);
+            Requisition req = requisitionRepository.findByRouteAndUser(bestRoute, user);
+            req.setTimesRequested(req.getTimesRequested() + 1);
+            requisitionRepository.save(req);
+            
         } else {
 
             origin = graph.findPlaceByName(originName);
@@ -86,6 +95,5 @@ public class RouteService {
         
         return result;
     }
-    
-    
+
 }

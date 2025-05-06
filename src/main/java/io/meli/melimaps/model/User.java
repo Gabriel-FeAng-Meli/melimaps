@@ -1,19 +1,17 @@
 package io.meli.melimaps.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.scheduling.annotation.Async;
 
+import io.meli.melimaps.interfaces.Observer;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 
 @Entity
 @Table
-public class User {
+public class User implements Observer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,15 +22,20 @@ public class User {
     private String transport;
     
     private Boolean hurry = false;
-
+    
     private Boolean accessibility = false;
-
+    
     private Boolean ecologic = false;
     
     private Boolean budget = false;
 
-    @ManyToMany(mappedBy = "users")
-    private List<Route> routes = new ArrayList<>();
+    private String email = "gabriel.feang@gmail.com";
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    // private Set<String> favorites = new HashSet<>();
 
     public User(String name, String transport,Boolean hurry, Boolean accessibility, Boolean ecologic, Boolean budget) {
         this.name = name;
@@ -103,12 +106,29 @@ public class User {
         this.hurry = hurry;
     }
 
-    public List<Route> getRoutes() {
-        return routes;
+    @Override
+    @Async
+    public void update() {
+
     }
 
-    public void setRoutes(List<Route> routes) {
-        this.routes = routes;
+    // public Set<String> getFavorites() {
+    //     return favorites;
+    // }
+
+    // public void setFavorites(Set<String> listOfFavoriteRouteRequestParameters) {
+    //     this.favorites = listOfFavoriteRouteRequestParameters;
+    // }
+
+    // public void addFavorite(Route route, Set<EnumPreference> preferences) {
+
+    //     String requestParameters = Route.generateRequestProperties(EnumTransport.valueOf(route.getTransport()), route.getOriginName(), route.getDestinationName(), preferences);
+
+    //     favorites.add(requestParameters);
+    // }
+
+    public String getEmail() {
+        return email;
     }
 
 }

@@ -15,11 +15,25 @@ public class Vertex implements Comparable<Vertex>{
     private List<Path> pathsInReachOrder;
     private Map<Vertex, Path> pathToChildren;
 
-    public Vertex(String name) {
-        this.name = name;
+    private Vertex(Builder builder) {
+        this.name = builder.name;
         this.weight = Integer.MAX_VALUE;
         this.pathsInReachOrder = new LinkedList<>();
         this.pathToChildren = new HashMap<>();
+    }
+
+    public static class Builder {
+        private String name;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Vertex build() {
+            return new Vertex(this);
+        }
+
     }
 
     public void addChildVertex(Vertex vertex, int distance, EnumTransport... transports) {

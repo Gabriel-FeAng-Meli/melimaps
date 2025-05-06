@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `budget` bit(1) DEFAULT 0,
   `ecologic` bit(1) DEFAULT 0,
   `hurry` bit(1) DEFAULT 0,
+  `email` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `transport` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
@@ -18,17 +19,22 @@ CREATE TABLE IF NOT EXISTS `route` (
   `time_to_reach` varchar(255) NOT NULL,
   `total_cost` varchar(255) NOT NULL,
   `transport` varchar(255) NOT NULL,
+  `available` bit(1) DEFAULT 1,
   `request_properties` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `route_user` (
+CREATE TABLE IF NOT EXISTS `requisition` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `times_requested` int(11) DEFAULT 1,
   `route_id` int NOT NULL,
   `user_id` int NOT NULL,
-  `usage_count` int DEFAULT 0,
 
   KEY `user` (`user_id`),
   KEY `route` (`route_id`),
   FOREIGN KEY (`route_id`) REFERENCES `route` (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+
+  PRIMARY KEY(`id`)
+
 );
